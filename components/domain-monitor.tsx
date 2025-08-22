@@ -212,7 +212,7 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
               </div>
               <div>
                 <h3 className="font-semibold">Market Analysis</h3>
-                <p className="text-sm text-muted-foreground">View DomainFi trends</p>
+                <p className="text-sm text-muted-foreground">View Domanitor trends</p>
               </div>
             </div>
           </CardContent>

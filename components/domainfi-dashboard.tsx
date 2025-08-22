@@ -12,9 +12,10 @@ import { AlertsPanel } from "@/components/alerts-panel"
 import { AnalyticsChart } from "@/components/analytics-chart"
 import { ConnectWallet } from "@/components/connect-wallet"
 import { DomaAPI } from "@/lib/doma-api"
-import { Bell, Globe, TrendingUp, Coins, Activity, ExternalLink } from "lucide-react"
+import { Bell, TrendingUp, Coins, Activity, ExternalLink } from "lucide-react"
+import Image from "next/image"
 
-export function DomainFiDashboard() {
+export function DomanitorDashboard() {
   const [isConnected, setIsConnected] = useState(false)
   const [notifications, setNotifications] = useState(3)
   const [metrics, setMetrics] = useState<any>(null)
@@ -50,8 +51,8 @@ export function DomainFiDashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <Globe className="h-8 w-8 text-accent" />
-                <h1 className="text-2xl font-bold text-foreground">DomainFi</h1>
+                <Image src="/domanitor-logo.png" alt="Domanitor Logo" width={32} height={32} className="h-8 w-8" />
+                <h1 className="text-2xl font-bold text-foreground">Domanitor</h1>
                 <Badge variant="secondary" className="bg-accent text-accent-foreground">
                   Doma Testnet
                 </Badge>
@@ -90,7 +91,7 @@ export function DomainFiDashboard() {
           <Alert className="mb-6 border-accent bg-accent/10">
             <Activity className="h-4 w-4" />
             <AlertDescription>
-              Connect your wallet to access DomainFi features and start tokenizing domains on Doma testnet.
+              Connect your wallet to access Domanitor features and start tokenizing domains on Doma testnet.
               <strong> All transactions are on testnet - no real funds required.</strong>
             </AlertDescription>
           </Alert>
@@ -101,7 +102,13 @@ export function DomainFiDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Domains</CardTitle>
-              <Globe className="h-4 w-4 text-muted-foreground" />
+              <Image
+                src="/domanitor-logo.png"
+                alt="Domanitor Logo"
+                width={32}
+                height={32}
+                className="h-4 w-4 text-muted-foreground"
+              />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{metrics?.totalDomains?.toLocaleString() || "..."}</div>

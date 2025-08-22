@@ -226,7 +226,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
         <Card>
           <CardHeader>
             <CardTitle>Doma Protocol Benefits</CardTitle>
-            <CardDescription>Revolutionary DomainFi features powered by Doma</CardDescription>
+            <CardDescription>Revolutionary Domanitor features powered by Doma</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start gap-3">
@@ -278,7 +278,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
             </div>
 
             <div className="pt-4 border-t">
-              <h4 className="font-semibold mb-2">DomainFi Features</h4>
+              <h4 className="font-semibold mb-2">Domanitor Features</h4>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="secondary">Fractional Ownership</Badge>
                 <Badge variant="secondary">Collateralized Lending</Badge>
