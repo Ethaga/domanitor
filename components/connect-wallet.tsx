@@ -1,32 +1,120 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Wallet, ChevronDown } from "lucide-react"
+import { Wallet, ChevronDown, AlertCircle } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface ConnectWalletProps {
   isConnected: boolean
   onConnect: (connected: boolean) => void
 }
 
+declare global {
+  interface Window {
+    ethereum?: any
+  }
+}
+
 export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
   const [address, setAddress] = useState("")
+  const [isConnecting, setIsConnecting] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleConnect = (walletType: string) => {
-    // Simulate wallet connection
-    const mockAddress = "0x1234...5678"
-    setAddress(mockAddress)
-    onConnect(true)
+  useEffect(() => {
+    checkConnection()
+  }, [])
+
+  const checkConnection = async () => {
+    if (typeof window !== "undefined" && window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_accounts" })
+        if (accounts.length > 0) {
+          const account = accounts[0]
+          setAddress(formatAddress(account))
+          onConnect(true)
+        }
+      } catch (error) {
+        console.error("Error checking wallet connection:", error)
+      }
+    }
+  }
+
+  const formatAddress = (addr: string) => {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`
+  }
+
+  const handleConnect = async (walletType: string) => {
+    if (walletType === "metamask") {
+      await connectMetaMask()
+    } else {
+      setError(`${walletType} integration coming soon!`)
+      setTimeout(() => setError(""), 3000)
+    }
+  }
+
+  const connectMetaMask = async () => {
+    setIsConnecting(true)
+    setError("")
+
+    try {
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        setError("MetaMask is not installed. Please install MetaMask to continue.")
+        setIsConnecting(false)
+        return
+      }
+
+      // Request account access
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      })
+
+      if (accounts.length > 0) {
+        const account = accounts[0]
+        setAddress(formatAddress(account))
+        onConnect(true)
+
+        // Switch to Doma testnet (if needed)
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0x1" }], // Ethereum mainnet for now, replace with Doma testnet when available
+          })
+        } catch (switchError: any) {
+          console.log("Network switch error:", switchError)
+        }
+      }
+    } catch (error: any) {
+      console.error("Error connecting to MetaMask:", error)
+      if (error.code === 4001) {
+        setError("Connection rejected by user")
+      } else {
+        setError("Failed to connect to MetaMask")
+      }
+    } finally {
+      setIsConnecting(false)
+    }
   }
 
   const handleDisconnect = () => {
     setAddress("")
     onConnect(false)
+    setError("")
   }
 
-  if (isConnected) {
+  if (error) {
+    return (
+      <Alert className="mb-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    )
+  }
+
+  if (isConnected && address) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -34,7 +122,7 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
             <Wallet className="h-4 w-4" />
             <span className="font-mono">{address}</span>
             <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-              Doma Testnet
+              Connected
             </Badge>
             <ChevronDown className="h-4 w-4" />
           </Button>
@@ -49,16 +137,16 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="flex items-center gap-2">
+        <Button className="flex items-center gap-2" disabled={isConnecting}>
           <Wallet className="h-4 w-4" />
-          Connect Wallet
+          {isConnecting ? "Connecting..." : "Connect Wallet"}
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => handleConnect("metamask")}>MetaMask</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleConnect("walletconnect")}>WalletConnect</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleConnect("coinbase")}>Coinbase Wallet</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleConnect("walletconnect")}>WalletConnect (Coming Soon)</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleConnect("coinbase")}>Coinbase Wallet (Coming Soon)</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

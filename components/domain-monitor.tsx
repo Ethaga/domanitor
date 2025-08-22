@@ -1,63 +1,65 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, ExternalLink, Clock, DollarSign, TrendingUp } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { DomaAPI, type DomainToken } from "@/lib/doma-api"
+import { Search, ExternalLink, Clock, DollarSign, TrendingUp, Layers, RefreshCw } from "lucide-react"
 
-const mockDomains = [
-  {
-    name: "crypto-defi.com",
-    status: "tokenized",
-    value: "$45,000",
-    expiry: "2025-12-15",
-    chain: "Doma",
-    alerts: 2,
-  },
-  {
-    name: "web3-domains.xyz",
-    status: "pending",
-    value: "$12,500",
-    expiry: "2025-03-22",
-    chain: "Ethereum",
-    alerts: 0,
-  },
-  {
-    name: "nft-marketplace.io",
-    status: "tokenized",
-    value: "$78,900",
-    expiry: "2026-01-08",
-    chain: "Doma",
-    alerts: 1,
-  },
-  {
-    name: "blockchain-tech.net",
-    status: "monitoring",
-    value: "$23,400",
-    expiry: "2025-06-30",
-    chain: "Polygon",
-    alerts: 3,
-  },
-]
+interface DomainMonitorProps {
+  walletAddress: string
+  isConnected: boolean
+}
 
-export function DomainMonitor() {
+export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps) {
   const [searchTerm, setSearchTerm] = useState("")
+  const [domains, setDomains] = useState<DomainToken[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (isConnected && walletAddress) {
+      loadDomains()
+    }
+  }, [isConnected, walletAddress])
+
+  const loadDomains = async () => {
+    if (!walletAddress) return
+
+    setLoading(true)
+    setError("")
+
+    try {
+      const domainTokens = await DomaAPI.getDomainTokens(walletAddress)
+      setDomains(domainTokens)
+    } catch (err) {
+      setError("Failed to load domain portfolio")
+      console.error("[v0] Error loading domains:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "tokenized":
+      case "active":
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
       case "pending":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-      case "monitoring":
+      case "expired":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+      case "transferring":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
     }
   }
+
+  const filteredDomains = domains.filter((domain) => domain.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   return (
     <div className="space-y-6">
@@ -65,74 +67,124 @@ export function DomainMonitor() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="h-5 w-5" />
-            Domain Portfolio Monitor
+            Doma Protocol Portfolio
           </CardTitle>
-          <CardDescription>Real-time monitoring of your tokenized domains across multiple chains</CardDescription>
+          <CardDescription>Real-time monitoring of your tokenized domains on Doma Protocol</CardDescription>
         </CardHeader>
         <CardContent>
+          {!isConnected && (
+            <Alert className="mb-6">
+              <AlertDescription>
+                Connect your wallet to view your tokenized domain portfolio from Doma Protocol.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex gap-4 mb-6">
             <div className="flex-1">
               <Input
-                placeholder="Search domains..."
+                placeholder="Search your domains..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full"
+                disabled={!isConnected}
               />
             </div>
-            <Button>
-              <Search className="h-4 w-4 mr-2" />
-              Search
+            <Button onClick={loadDomains} disabled={!isConnected || loading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+              Refresh
             </Button>
-            <Button variant="outline">Add Domain</Button>
+            <Button variant="outline" asChild>
+              <a href="https://start.doma.xyz" target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Doma Testnet
+              </a>
+            </Button>
           </div>
 
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Domain</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Expiry</TableHead>
-                  <TableHead>Chain</TableHead>
-                  <TableHead>Alerts</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockDomains.map((domain, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{domain.name}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(domain.status)}>{domain.status}</Badge>
-                    </TableCell>
-                    <TableCell className="font-mono">{domain.value}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        {domain.expiry}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{domain.chain}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {domain.alerts > 0 ? (
-                        <Badge variant="destructive">{domain.alerts}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground">None</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {isConnected && (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Domain</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Floor Price</TableHead>
+                    <TableHead>Expiry</TableHead>
+                    <TableHead>Registrar</TableHead>
+                    <TableHead>Shares</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8">
+                        <RefreshCw className="h-4 w-4 animate-spin mx-auto mb-2" />
+                        Loading domains from Doma Protocol...
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredDomains.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                        {isConnected
+                          ? "No tokenized domains found. Start by tokenizing your first domain!"
+                          : "Connect wallet to view domains"}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredDomains.map((domain) => (
+                      <TableRow key={domain.id}>
+                        <TableCell className="font-medium">{domain.name}</TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(domain.status)}>{domain.status}</Badge>
+                        </TableCell>
+                        <TableCell className="font-mono">${domain.floorPrice.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3 text-muted-foreground" />
+                            {domain.expirationDate}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{domain.registrar}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          {domain.fractionalized ? (
+                            <div className="flex items-center gap-1">
+                              <Layers className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-sm">
+                                {domain.availableShares}/{domain.totalShares}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">Whole</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm" asChild>
+                            <a
+                              href={`https://sepolia.etherscan.io/token/${domain.tokenId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -146,7 +198,7 @@ export function DomainMonitor() {
               </div>
               <div>
                 <h3 className="font-semibold">Bulk Tokenize</h3>
-                <p className="text-sm text-muted-foreground">Tokenize multiple domains</p>
+                <p className="text-sm text-muted-foreground">Tokenize multiple domains on Doma</p>
               </div>
             </div>
           </CardContent>
@@ -160,7 +212,7 @@ export function DomainMonitor() {
               </div>
               <div>
                 <h3 className="font-semibold">Market Analysis</h3>
-                <p className="text-sm text-muted-foreground">View domain trends</p>
+                <p className="text-sm text-muted-foreground">View DomainFi trends</p>
               </div>
             </div>
           </CardContent>
@@ -170,11 +222,11 @@ export function DomainMonitor() {
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-accent/10 rounded-lg">
-                <Clock className="h-5 w-5 text-accent" />
+                <Layers className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <h3 className="font-semibold">Renewal Manager</h3>
-                <p className="text-sm text-muted-foreground">Manage expirations</p>
+                <h3 className="font-semibold">Fractionalize</h3>
+                <p className="text-sm text-muted-foreground">Split domains into shares</p>
               </div>
             </div>
           </CardContent>

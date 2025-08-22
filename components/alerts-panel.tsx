@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,37 +8,81 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Bell, Bot, Mail, MessageSquare, Calendar, DollarSign, TrendingUp } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Bell,
+  Bot,
+  Mail,
+  MessageSquare,
+  Calendar,
+  DollarSign,
+  TrendingUp,
+  ExternalLink,
+  Zap,
+  Users,
+  Target,
+} from "lucide-react"
 
-export function AlertsPanel() {
+interface AlertsPanelProps {
+  walletAddress: string
+  isConnected: boolean
+}
+
+export function AlertsPanel({ walletAddress, isConnected }: AlertsPanelProps) {
   const [emailAlerts, setEmailAlerts] = useState(true)
   const [discordAlerts, setDiscordAlerts] = useState(false)
   const [telegramAlerts, setTelegramAlerts] = useState(true)
+  const [subscriptionTier, setSubscriptionTier] = useState("free")
+  const [botMetrics, setBotMetrics] = useState<any>(null)
+
+  useEffect(() => {
+    if (isConnected) {
+      const loadBotMetrics = async () => {
+        // Simulate real Doma API call for bot performance metrics
+        setBotMetrics({
+          totalAlertsSent: 1247,
+          activeSubscribers: 89,
+          revenueGenerated: 2340,
+          domaTransactions: 156,
+          userAcquisition: 23,
+          communityEngagement: 78,
+        })
+      }
+      loadBotMetrics()
+    }
+  }, [isConnected])
 
   const alerts = [
     {
       id: 1,
       type: "expiry",
       domain: "crypto-defi.com",
-      message: "Domain expires in 30 days",
+      message: "Domain expires in 30 days - Auto-renewal available",
       priority: "high",
       time: "2 hours ago",
+      action: "Renew Now",
+      domaLink: "https://start.doma.xyz/domain/crypto-defi.com",
     },
     {
       id: 2,
       type: "sale",
       domain: "web3-domains.xyz",
-      message: "Similar domain sold for $45K",
+      message: "Similar domain sold for $45K - Market opportunity detected",
       priority: "medium",
       time: "5 hours ago",
+      action: "View Market",
+      domaLink: "https://start.doma.xyz/marketplace",
     },
     {
       id: 3,
       type: "price",
       domain: "nft-marketplace.io",
-      message: "Domain value increased by 15%",
+      message: "Domain value increased by 15% - Consider fractionalization",
       priority: "low",
       time: "1 day ago",
+      action: "Tokenize",
+      domaLink: "https://start.doma.xyz/tokenize",
     },
   ]
 
@@ -70,11 +114,35 @@ export function AlertsPanel() {
 
   return (
     <div className="space-y-6">
+      {isConnected && (
+        <Card className="border-accent bg-accent/5">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Zap className="h-5 w-5 text-accent" />
+                <div>
+                  <h4 className="font-semibold">Bot Subscription: {subscriptionTier.toUpperCase()}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {subscriptionTier === "free" ? "Limited to 10 domains" : "Unlimited domains + premium features"}
+                  </p>
+                </div>
+              </div>
+              {subscriptionTier === "free" && (
+                <Button size="sm" className="bg-accent hover:bg-accent/90">
+                  Upgrade to Pro - $29/month
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Tabs defaultValue="alerts" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="alerts">Active Alerts</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="alerts">Live Alerts</TabsTrigger>
           <TabsTrigger value="bots">Alert Bots</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
+          <TabsTrigger value="settings">Bot Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="alerts" className="space-y-4">
@@ -82,9 +150,12 @@ export function AlertsPanel() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Recent Alerts
+                Real-Time Domain Alerts
               </CardTitle>
-              <CardDescription>Real-time notifications for your domain portfolio</CardDescription>
+              <CardDescription>
+                On-chain notifications powered by Doma Protocol - driving {botMetrics?.domaTransactions || 0}{" "}
+                transactions today
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -99,9 +170,22 @@ export function AlertsPanel() {
                       <p className="text-sm text-muted-foreground">{alert.message}</p>
                       <p className="text-xs text-muted-foreground mt-1">{alert.time}</p>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      Dismiss
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" asChild>
+                        <a
+                          href={alert.domaLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          {alert.action}
+                        </a>
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        Dismiss
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -115,25 +199,29 @@ export function AlertsPanel() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bot className="h-5 w-5" />
-                  Expiry Bot
+                  Telegram Alert Bot
                 </CardTitle>
-                <CardDescription>Automated alerts for domain expirations</CardDescription>
+                <CardDescription>Automated Telegram notifications with direct buy links</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Status</span>
-                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Active</Badge>
+                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Live</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Domains Monitored</span>
-                  <span className="font-mono">1,247</span>
+                  <span className="text-sm">Subscribers</span>
+                  <span className="font-mono">{botMetrics?.activeSubscribers || 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Alerts Sent (24h)</span>
-                  <span className="font-mono">23</span>
+                  <span className="text-sm">Doma Transactions</span>
+                  <span className="font-mono text-accent">{botMetrics?.domaTransactions || 0}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Revenue Generated</span>
+                  <span className="font-mono text-green-600">${botMetrics?.revenueGenerated || 0}</span>
                 </div>
                 <Button variant="outline" className="w-full bg-transparent">
-                  Configure Bot
+                  Configure Telegram Bot
                 </Button>
               </CardContent>
             </Card>
@@ -142,9 +230,9 @@ export function AlertsPanel() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bot className="h-5 w-5" />
-                  Market Bot
+                  Twitter/X Alert Bot
                 </CardTitle>
-                <CardDescription>Track domain sales and market trends</CardDescription>
+                <CardDescription>Share domain opportunities with custom filters</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -152,15 +240,19 @@ export function AlertsPanel() {
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Active</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Sales Tracked</span>
-                  <span className="font-mono">156</span>
+                  <span className="text-sm">Followers Reached</span>
+                  <span className="font-mono">2,847</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Opportunities Found</span>
-                  <span className="font-mono">12</span>
+                  <span className="text-sm">Engagement Rate</span>
+                  <span className="font-mono">{botMetrics?.communityEngagement || 0}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">User Acquisition</span>
+                  <span className="font-mono text-accent">{botMetrics?.userAcquisition || 0}</span>
                 </div>
                 <Button variant="outline" className="w-full bg-transparent">
-                  Configure Bot
+                  Configure Twitter Bot
                 </Button>
               </CardContent>
             </Card>
@@ -168,34 +260,167 @@ export function AlertsPanel() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Create New Bot</CardTitle>
-              <CardDescription>Set up custom automation for your domain portfolio</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Rule-Based Domain Monitor
+              </CardTitle>
+              <CardDescription>Set up custom business logic for automated transactions</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <Calendar className="h-8 w-8 mx-auto mb-2 text-accent" />
-                    <h4 className="font-semibold">Renewal Bot</h4>
-                    <p className="text-xs text-muted-foreground">Auto-renew domains</p>
-                  </CardContent>
-                </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Domain Filter</Label>
+                  <Input placeholder="e.g., *.crypto, web3-*" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Price Threshold</Label>
+                  <Input placeholder="e.g., < $10,000" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Expiry Window</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select timeframe" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="7d">7 days</SelectItem>
+                      <SelectItem value="30d">30 days</SelectItem>
+                      <SelectItem value="90d">90 days</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Auto-Action</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select action" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="alert">Send Alert Only</SelectItem>
+                      <SelectItem value="bid">Auto-Bid</SelectItem>
+                      <SelectItem value="renew">Auto-Renew</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Custom Logic</Label>
+                <Textarea
+                  placeholder="Define custom business rules for automated transactions..."
+                  className="min-h-[100px]"
+                />
+              </div>
+              <Button className="w-full">Create Monitoring Rule</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <DollarSign className="h-8 w-8 mx-auto mb-2 text-accent" />
-                    <h4 className="font-semibold">Price Alert Bot</h4>
-                    <p className="text-xs text-muted-foreground">Monitor value changes</p>
-                  </CardContent>
-                </Card>
+        <TabsContent value="subscriptions" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className={subscriptionTier === "free" ? "border-2 border-accent" : ""}>
+              <CardHeader>
+                <CardTitle>Free Tier</CardTitle>
+                <CardDescription>Basic domain monitoring</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-2xl font-bold">
+                  $0<span className="text-sm font-normal">/month</span>
+                </div>
+                <ul className="space-y-2 text-sm">
+                  <li>• Monitor up to 10 domains</li>
+                  <li>• Basic expiry alerts</li>
+                  <li>• Email notifications</li>
+                  <li>• Community support</li>
+                </ul>
+                <Button
+                  variant={subscriptionTier === "free" ? "default" : "outline"}
+                  className="w-full"
+                  disabled={subscriptionTier === "free"}
+                >
+                  {subscriptionTier === "free" ? "Current Plan" : "Downgrade"}
+                </Button>
+              </CardContent>
+            </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <TrendingUp className="h-8 w-8 mx-auto mb-2 text-accent" />
-                    <h4 className="font-semibold">Trend Bot</h4>
-                    <p className="text-xs text-muted-foreground">Track market trends</p>
-                  </CardContent>
-                </Card>
+            <Card className={subscriptionTier === "pro" ? "border-2 border-accent" : ""}>
+              <CardHeader>
+                <CardTitle>Pro Tier</CardTitle>
+                <CardDescription>Advanced automation & analytics</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-2xl font-bold">
+                  $29<span className="text-sm font-normal">/month</span>
+                </div>
+                <ul className="space-y-2 text-sm">
+                  <li>• Unlimited domain monitoring</li>
+                  <li>• Telegram & Twitter bots</li>
+                  <li>• Custom rule-based alerts</li>
+                  <li>• Auto-transaction features</li>
+                  <li>• Priority support</li>
+                </ul>
+                <Button
+                  variant={subscriptionTier === "pro" ? "default" : "outline"}
+                  className="w-full"
+                  onClick={() => setSubscriptionTier("pro")}
+                >
+                  {subscriptionTier === "pro" ? "Current Plan" : "Upgrade to Pro"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className={subscriptionTier === "enterprise" ? "border-2 border-accent" : ""}>
+              <CardHeader>
+                <CardTitle>Enterprise</CardTitle>
+                <CardDescription>White-label & API access</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-2xl font-bold">
+                  $199<span className="text-sm font-normal">/month</span>
+                </div>
+                <ul className="space-y-2 text-sm">
+                  <li>• Everything in Pro</li>
+                  <li>• White-label bot deployment</li>
+                  <li>• API access & webhooks</li>
+                  <li>• Custom integrations</li>
+                  <li>• Dedicated support</li>
+                </ul>
+                <Button
+                  variant={subscriptionTier === "enterprise" ? "default" : "outline"}
+                  className="w-full"
+                  onClick={() => setSubscriptionTier("enterprise")}
+                >
+                  {subscriptionTier === "enterprise" ? "Current Plan" : "Contact Sales"}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Subscription Analytics
+              </CardTitle>
+              <CardDescription>Track user acquisition and revenue metrics</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-accent">{botMetrics?.activeSubscribers || 0}</div>
+                  <div className="text-sm text-muted-foreground">Active Subscribers</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">${botMetrics?.revenueGenerated || 0}</div>
+                  <div className="text-sm text-muted-foreground">Monthly Revenue</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{botMetrics?.userAcquisition || 0}</div>
+                  <div className="text-sm text-muted-foreground">New Users (24h)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{botMetrics?.domaTransactions || 0}</div>
+                  <div className="text-sm text-muted-foreground">Doma Transactions</div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -204,7 +429,10 @@ export function AlertsPanel() {
         <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-muted-foreground" />
+                Notification Preferences
+              </CardTitle>
               <CardDescription>Configure how you receive alerts and notifications</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
