@@ -15,6 +15,7 @@ interface ConnectWalletProps {
 declare global {
   interface Window {
     ethereum?: any
+    okxwallet?: any
   }
 }
 
@@ -22,22 +23,42 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
   const [address, setAddress] = useState("")
   const [isConnecting, setIsConnecting] = useState(false)
   const [error, setError] = useState("")
+  const [connectedWallet, setConnectedWallet] = useState("")
 
   useEffect(() => {
     checkConnection()
   }, [])
 
   const checkConnection = async () => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: "eth_accounts" })
-        if (accounts.length > 0) {
-          const account = accounts[0]
-          setAddress(formatAddress(account))
-          onConnect(true)
+    if (typeof window !== "undefined") {
+      if (window.ethereum && !window.ethereum.isOkxWallet) {
+        try {
+          const accounts = await window.ethereum.request({ method: "eth_accounts" })
+          if (accounts.length > 0) {
+            const account = accounts[0]
+            setAddress(formatAddress(account))
+            setConnectedWallet("MetaMask")
+            onConnect(true)
+            return
+          }
+        } catch (error) {
+          console.error("Error checking MetaMask connection:", error)
         }
-      } catch (error) {
-        console.error("Error checking wallet connection:", error)
+      }
+
+      if (window.okxwallet) {
+        try {
+          const accounts = await window.okxwallet.request({ method: "eth_accounts" })
+          if (accounts.length > 0) {
+            const account = accounts[0]
+            setAddress(formatAddress(account))
+            setConnectedWallet("OKX Wallet")
+            onConnect(true)
+            return
+          }
+        } catch (error) {
+          console.error("Error checking OKX wallet connection:", error)
+        }
       }
     }
   }
@@ -49,6 +70,10 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
   const handleConnect = async (walletType: string) => {
     if (walletType === "metamask") {
       await connectMetaMask()
+    } else if (walletType === "okx") {
+      await connectOKX()
+    } else if (walletType === "walletconnect") {
+      await connectWalletConnect()
     } else {
       setError(`${walletType} integration coming soon!`)
       setTimeout(() => setError(""), 3000)
@@ -60,14 +85,12 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
     setError("")
 
     try {
-      // Check if MetaMask is installed
       if (!window.ethereum) {
         setError("MetaMask is not installed. Please install MetaMask to continue.")
         setIsConnecting(false)
         return
       }
 
-      // Request account access
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       })
@@ -75,13 +98,13 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
       if (accounts.length > 0) {
         const account = accounts[0]
         setAddress(formatAddress(account))
+        setConnectedWallet("MetaMask")
         onConnect(true)
 
-        // Switch to Doma testnet (if needed)
         try {
           await window.ethereum.request({
             method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x1" }], // Ethereum mainnet for now, replace with Doma testnet when available
+            params: [{ chainId: "0x1" }],
           })
         } catch (switchError: any) {
           console.log("Network switch error:", switchError)
@@ -99,8 +122,83 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
     }
   }
 
+  const connectOKX = async () => {
+    setIsConnecting(true)
+    setError("")
+
+    try {
+      if (!window.okxwallet) {
+        setError("OKX Wallet is not installed. Please install OKX Wallet to continue.")
+        setIsConnecting(false)
+        return
+      }
+
+      const accounts = await window.okxwallet.request({
+        method: "eth_requestAccounts",
+      })
+
+      if (accounts.length > 0) {
+        const account = accounts[0]
+        setAddress(formatAddress(account))
+        setConnectedWallet("OKX Wallet")
+        onConnect(true)
+
+        try {
+          await window.okxwallet.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0x1" }],
+          })
+        } catch (switchError: any) {
+          console.log("Network switch error:", switchError)
+        }
+      }
+    } catch (error: any) {
+      console.error("Error connecting to OKX Wallet:", error)
+      if (error.code === 4001) {
+        setError("Connection rejected by user")
+      } else {
+        setError("Failed to connect to OKX Wallet")
+      }
+    } finally {
+      setIsConnecting(false)
+    }
+  }
+
+  const connectWalletConnect = async () => {
+    setIsConnecting(true)
+    setError("")
+
+    try {
+      const { default: WalletConnectProvider } = await import("@walletconnect/web3-provider")
+
+      const provider = new WalletConnectProvider({
+        infuraId: "your-infura-id",
+        rpc: {
+          1: "https://mainnet.infura.io/v3/your-infura-id",
+        },
+      })
+
+      await provider.enable()
+
+      const accounts = await provider.request({ method: "eth_accounts" })
+      if (accounts.length > 0) {
+        const account = accounts[0]
+        setAddress(formatAddress(account))
+        setConnectedWallet("WalletConnect")
+        onConnect(true)
+      }
+    } catch (error: any) {
+      console.error("Error connecting with WalletConnect:", error)
+      setError("WalletConnect requires additional setup. Please use MetaMask or OKX Wallet for now.")
+      setTimeout(() => setError(""), 3000)
+    } finally {
+      setIsConnecting(false)
+    }
+  }
+
   const handleDisconnect = () => {
     setAddress("")
+    setConnectedWallet("")
     onConnect(false)
     setError("")
   }
@@ -122,7 +220,7 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
             <Wallet className="h-4 w-4" />
             <span className="font-mono">{address}</span>
             <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-              Connected
+              {connectedWallet}
             </Badge>
             <ChevronDown className="h-4 w-4" />
           </Button>
@@ -144,9 +242,24 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleConnect("metamask")}>MetaMask</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleConnect("walletconnect")}>WalletConnect (Coming Soon)</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleConnect("coinbase")}>Coinbase Wallet (Coming Soon)</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleConnect("metamask")}>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-orange-500 rounded"></div>
+            MetaMask
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleConnect("okx")}>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-black rounded"></div>
+            OKX Wallet
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleConnect("walletconnect")}>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-blue-500 rounded"></div>
+            WalletConnect
+          </div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
