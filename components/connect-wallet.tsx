@@ -169,27 +169,30 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
     setError("")
 
     try {
-      const { default: WalletConnectProvider } = await import("@walletconnect/web3-provider")
+      // For now, show a message that WalletConnect integration is in progress
+      setError(
+        "WalletConnect integration is being finalized. Please use MetaMask or OKX Wallet for the best experience.",
+      )
+      setTimeout(() => setError(""), 5000)
 
-      const provider = new WalletConnectProvider({
-        infuraId: "your-infura-id",
-        rpc: {
-          1: "https://mainnet.infura.io/v3/your-infura-id",
-        },
-      })
-
-      await provider.enable()
-
-      const accounts = await provider.request({ method: "eth_accounts" })
-      if (accounts.length > 0) {
-        const account = accounts[0]
-        setAddress(formatAddress(account))
-        setConnectedWallet("WalletConnect")
-        onConnect(true)
-      }
+      // TODO: Implement full WalletConnect v2 integration
+      // const { EthereumProvider } = await import("@walletconnect/ethereum-provider")
+      // const provider = await EthereumProvider.init({
+      //   projectId: "your-project-id",
+      //   chains: [1],
+      //   showQrModal: true
+      // })
+      // await provider.connect()
+      // const accounts = await provider.request({ method: "eth_accounts" })
+      // if (accounts.length > 0) {
+      //   const account = accounts[0]
+      //   setAddress(formatAddress(account))
+      //   setConnectedWallet("WalletConnect")
+      //   onConnect(true)
+      // }
     } catch (error: any) {
-      console.error("Error connecting with WalletConnect:", error)
-      setError("WalletConnect requires additional setup. Please use MetaMask or OKX Wallet for now.")
+      console.error("Error with WalletConnect:", error)
+      setError("WalletConnect setup in progress. Please use MetaMask or OKX Wallet.")
       setTimeout(() => setError(""), 3000)
     } finally {
       setIsConnecting(false)
