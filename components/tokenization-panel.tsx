@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { DomaAPI, type TokenizationRequest } from "@/lib/doma-api"
 import { Coins, Zap, Shield, ArrowRight, ExternalLink, Layers, DollarSign } from "lucide-react"
+import { LoanCalculator } from "@/components/loan-calculator"
 
 interface TokenizationPanelProps {
   walletAddress: string
@@ -153,9 +154,10 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
                   <DollarSign className="h-4 w-4 text-accent" />
                   <span className="font-semibold text-sm">Domain Financing</span>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mb-3">
                   Gunakan domain sebagai jaminan pinjaman atau sewa pendanaan
                 </p>
+                <LoanCalculator minValue={100} maxValue={10000} loanPercentage={70} />
               </div>
 
               {fractionalize && (

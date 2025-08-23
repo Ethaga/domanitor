@@ -268,9 +268,11 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
   if (isConnected && address) {
     return (
       <div className="flex items-center gap-2">
-        <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-          <Shield className="h-3 w-3 mr-1" />
-          DID
+        <Badge
+          variant="default"
+          className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-300"
+        >
+          DID Verified
         </Badge>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

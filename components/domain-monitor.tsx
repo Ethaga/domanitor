@@ -28,7 +28,7 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
       setDomains([
         {
           id: "1",
-          name: "yourname.eth",
+          name: "user123.eth",
           status: "active",
           floorPrice: 25000,
           expirationDate: "2025-12-15",
@@ -41,7 +41,7 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
         },
         {
           id: "2",
-          name: "yourname.sol",
+          name: "brand456.sol",
           status: "active",
           floorPrice: 15000,
           expirationDate: "2025-11-20",
@@ -104,11 +104,23 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
   const getChainLogo = (chain: string) => {
     switch (chain) {
       case "ethereum":
-        return <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+        return (
+          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+            Ξ
+          </div>
+        )
       case "solana":
-        return <div className="w-4 h-4 bg-purple-500 rounded-full"></div>
+        return (
+          <div className="w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+            ◎
+          </div>
+        )
       case "bnb":
-        return <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+        return (
+          <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+            B
+          </div>
+        )
       case "cosmos":
         return <div className="w-4 h-4 bg-indigo-500 rounded-full"></div>
       default:
