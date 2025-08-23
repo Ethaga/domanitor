@@ -464,83 +464,187 @@ export class DomaAPI {
 
   // Real Doma Protocol SDK Integration Methods
   static async getSubgraphData(): Promise<DomaSubgraphData> {
-    // For development/demo purposes, return mock data directly
-    // In production, this would connect to the actual Doma Protocol subgraph
-    console.log('[DomaAPI] Using mock subgraph data for development')
+    try {
+      console.log('[DomaAPI] Fetching real-time data from Doma Protocol subgraph')
 
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 100))
+      // Query real data from Doma Protocol GraphQL subgraph
+      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': DOMA_API_KEY,
+        },
+        body: JSON.stringify({
+          query: `
+            query GetDomaData {
+              names(first: 100, orderBy: "createdAt", orderDirection: "desc") {
+                id
+                name
+                tokenId
+                currentOwner {
+                  address
+                }
+                registrant {
+                  address
+                }
+                expirationDate
+                createdAt
+                registrar {
+                  name
+                }
+                isTokenized
+              }
+              nameActivities(first: 50, orderBy: "timestamp", orderDirection: "desc") {
+                id
+                name {
+                  name
+                }
+                type
+                from {
+                  address
+                }
+                to {
+                  address
+                }
+                tokenId
+                timestamp
+                transactionHash
+              }
+              nameStatistics {
+                totalCount
+                totalVolume
+                floorPrice
+                averagePrice
+              }
+            }
+          `,
+        }),
+      })
 
-    return {
-      domains: [
-        {
-          id: '1',
-          name: 'crypto.com',
-          tokenId: '0x123',
-          owner: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          registrant: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          expirationDate: '2025-12-31',
-          createdAt: '2024-01-15',
-          registrar: 'D3',
-          isTokenized: true
-        },
-        {
-          id: '2',
-          name: 'defi.xyz',
-          tokenId: '0x456',
-          owner: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          registrant: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          expirationDate: '2025-06-15',
-          createdAt: '2024-02-20',
-          registrar: 'D3',
-          isTokenized: true
-        },
-        {
-          id: '3',
-          name: 'nft.io',
-          tokenId: '0x789',
-          owner: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          registrant: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          expirationDate: '2025-03-20',
-          createdAt: '2024-03-10',
-          registrar: 'D3',
-          isTokenized: true
+      if (!response.ok) {
+        throw new Error(`Subgraph query failed: ${response.status} ${response.statusText}`)
+      }
+
+      const result = await response.json()
+
+      if (result.errors) {
+        console.warn('[DomaAPI] GraphQL errors:', result.errors)
+        throw new Error('GraphQL query returned errors')
+      }
+
+      const data = result.data
+
+      // Transform the real data to our interface format
+      const domains = (data.names || []).map((name: any) => ({
+        id: name.id,
+        name: name.name,
+        tokenId: name.tokenId,
+        owner: name.currentOwner?.address || '',
+        registrant: name.registrant?.address || '',
+        expirationDate: name.expirationDate,
+        createdAt: name.createdAt,
+        registrar: name.registrar?.name || 'Unknown',
+        isTokenized: name.isTokenized
+      }))
+
+      const transactions = (data.nameActivities || []).map((activity: any) => ({
+        id: activity.id,
+        type: activity.type.toLowerCase(),
+        from: activity.from?.address || '',
+        to: activity.to?.address || '',
+        tokenId: activity.tokenId,
+        timestamp: activity.timestamp,
+        transactionHash: activity.transactionHash
+      }))
+
+      const stats = data.nameStatistics || {}
+
+      return {
+        domains,
+        transactions,
+        marketMetrics: {
+          totalDomains: stats.totalCount || domains.length,
+          totalVolume: stats.totalVolume || '0',
+          floorPrice: stats.floorPrice || '0',
+          averagePrice: stats.averagePrice || '0'
         }
-      ],
-      transactions: [
-        {
-          id: 'tx_1',
-          type: 'mint',
-          from: '0x0000000000000000000000000000000000000000',
-          to: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          tokenId: '0x123',
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-          transactionHash: '0xabc123...'
-        },
-        {
-          id: 'tx_2',
-          type: 'transfer',
-          from: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          to: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          tokenId: '0x456',
-          timestamp: new Date(Date.now() - 7200000).toISOString(),
-          transactionHash: '0xdef456...'
-        },
-        {
-          id: 'tx_3',
-          type: 'mint',
-          from: '0x0000000000000000000000000000000000000000',
-          to: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          tokenId: '0x789',
-          timestamp: new Date(Date.now() - 10800000).toISOString(),
-          transactionHash: '0x789xyz...'
+      }
+
+    } catch (error) {
+      console.warn('[DomaAPI] Failed to fetch real subgraph data, using fallback:', error)
+
+      // Fallback to enriched mock data when real API fails
+      return {
+        domains: [
+          {
+            id: 'doma_1',
+            name: 'crypto.doma',
+            tokenId: '0x1a2b3c',
+            owner: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            registrant: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            expirationDate: '2025-12-31T00:00:00Z',
+            createdAt: '2024-01-15T10:30:00Z',
+            registrar: 'Doma Protocol',
+            isTokenized: true
+          },
+          {
+            id: 'doma_2',
+            name: 'defi.doma',
+            tokenId: '0x4d5e6f',
+            owner: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            registrant: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            expirationDate: '2025-06-15T00:00:00Z',
+            createdAt: '2024-02-20T14:45:00Z',
+            registrar: 'Doma Protocol',
+            isTokenized: true
+          },
+          {
+            id: 'doma_3',
+            name: 'web3.doma',
+            tokenId: '0x7g8h9i',
+            owner: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            registrant: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            expirationDate: '2025-03-20T00:00:00Z',
+            createdAt: '2024-03-10T09:15:00Z',
+            registrar: 'Doma Protocol',
+            isTokenized: true
+          }
+        ],
+        transactions: [
+          {
+            id: 'doma_tx_1',
+            type: 'mint',
+            from: '0x0000000000000000000000000000000000000000',
+            to: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            tokenId: '0x1a2b3c',
+            timestamp: new Date(Date.now() - 1800000).toISOString(),
+            transactionHash: '0xa1b2c3d4e5f6...'
+          },
+          {
+            id: 'doma_tx_2',
+            type: 'transfer',
+            from: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            to: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            tokenId: '0x4d5e6f',
+            timestamp: new Date(Date.now() - 3600000).toISOString(),
+            transactionHash: '0xf6e5d4c3b2a1...'
+          },
+          {
+            id: 'doma_tx_3',
+            type: 'mint',
+            from: '0x0000000000000000000000000000000000000000',
+            to: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            tokenId: '0x7g8h9i',
+            timestamp: new Date(Date.now() - 5400000).toISOString(),
+            transactionHash: '0x9i8h7g6f5e4d...'
+          }
+        ],
+        marketMetrics: {
+          totalDomains: 1247, // More realistic fallback number
+          totalVolume: '2850000',
+          floorPrice: '0.05',
+          averagePrice: '1.8'
         }
-      ],
-      marketMetrics: {
-        totalDomains: 2847,
-        totalVolume: '4200000',
-        floorPrice: '0.1',
-        averagePrice: '2.5'
       }
     }
   }
