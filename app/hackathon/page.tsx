@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ExternalLink, Play, FileText, Shield, Star } from "lucide-react"
+import { CountdownTimer } from "@/components/countdown-timer"
 import Image from "next/image"
 
 export default function HackathonPage() {
@@ -28,6 +29,8 @@ export default function HackathonPage() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
+          <CountdownTimer />
+
           {/* Hero Section */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold">🚀 DomainFi Challenge Submission</h1>

@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { DomaAPI, type TokenizationRequest } from "@/lib/doma-api"
 import { Coins, Zap, Shield, ArrowRight, ExternalLink, Layers, DollarSign } from "lucide-react"
 import { LoanCalculator } from "@/components/loan-calculator"
+import { TransactionSimulator } from "@/components/transaction-simulator"
 
 interface TokenizationPanelProps {
   walletAddress: string
@@ -317,6 +318,10 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
           <CardDescription>Latest domains tokenized on the Doma testnet</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-6">
+            <TransactionSimulator />
+          </div>
+
           <div className="space-y-3">
             {[
               {

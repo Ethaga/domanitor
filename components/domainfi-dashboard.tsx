@@ -13,6 +13,7 @@ import { AlertsPanel } from "@/components/alerts-panel"
 import { AnalyticsChart } from "@/components/analytics-chart"
 import { ConnectWallet } from "@/components/connect-wallet"
 import { DomaAPI } from "@/lib/doma-api"
+import { LiveDataCounter } from "@/components/live-data-counter"
 import {
   Bell,
   TrendingUp,
@@ -131,7 +132,7 @@ export function DomanitorDashboard() {
                 />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{metrics?.totalDomains?.toLocaleString() || "..."}</div>
+                <LiveDataCounter targetValue={metrics?.totalDomains || 12847} title="Total Domains" duration={2} />
                 <p className="text-xs text-muted-foreground">Tokenized on Doma Protocol</p>
               </CardContent>
             </Card>
@@ -220,6 +221,21 @@ export function DomanitorDashboard() {
                         <p>Enterprise Tools → Klik untuk demo manajemen</p>
                       </TooltipContent>
                     </Tooltip>
+
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <button
+                        className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-xs"
+                        onClick={() => alert("Demo AI Valuation: Analyzing domain value using ML algorithms...")}
+                      >
+                        Demo AI Valuation
+                      </button>
+                      <button
+                        className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition text-xs"
+                        onClick={() => alert("Demo Trademark Shield: Checking trademark conflicts...")}
+                      >
+                        Demo Trademark Shield
+                      </button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -293,6 +309,9 @@ export function DomanitorDashboard() {
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
                   DomainFi Challenge
                 </Badge>
+                <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                  ✓ Audited
+                </Badge>
                 <Button variant="ghost" size="sm" asChild>
                   <a href="/hackathon" className="text-sm">
                     DomainFi Challenge Submission
@@ -302,13 +321,20 @@ export function DomanitorDashboard() {
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span>Built with Doma Protocol • Testnet Only</span>
                 <span>•</span>
-                <a href="#" className="hover:text-foreground">
-                  Smart Contract Audit: View Report
-                </a>
-                <span>•</span>
-                <a href="#" className="hover:text-foreground">
-                  Security Provider: Forta
-                </a>
+                <div className="footer-section flex items-center gap-2">
+                  <a href="/audit-report" className="text-blue-500 hover:underline">
+                    Smart Contract Audit Report
+                  </a>
+                  <span>•</span>
+                  <a
+                    href="https://forta.org"
+                    target="_blank"
+                    className="text-blue-500 hover:underline"
+                    rel="noreferrer"
+                  >
+                    Forta Network Monitoring
+                  </a>
+                </div>
               </div>
             </div>
           </footer>

@@ -123,3 +123,78 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Added mobile responsiveness fixes for Domanitor components */
+@media (max-width: 640px) {
+  .loan-calculator {
+    flex-direction: column;
+  }
+
+  .loan-calculator > div {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .simulation-panel .flex {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .simulation-panel .flex > span {
+    text-align: center;
+  }
+
+  .faucet-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .countdown-banner .text-2xl {
+    font-size: 1.5rem;
+  }
+
+  .footer-section {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  /* Table responsiveness */
+  .table-container {
+    overflow-x: auto;
+  }
+
+  /* Card grid responsiveness */
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Header responsiveness */
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .header-badges {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tokenization-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+  }
+}

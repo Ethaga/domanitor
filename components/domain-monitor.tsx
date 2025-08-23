@@ -132,6 +132,19 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
 
   return (
     <div className="space-y-6">
+      {isConnected && (
+        <div className="faucet-banner bg-blue-50 dark:bg-blue-950 p-3 rounded-lg flex items-center justify-between border border-blue-200 dark:border-blue-800">
+          <span className="text-blue-800 dark:text-blue-200">Need test tokens? Get free DOMA-TEST tokens</span>
+          <Button
+            size="sm"
+            className="bg-blue-500 hover:bg-blue-600 text-white"
+            onClick={() => window.open("https://start.doma.xyz/faucet", "_blank")}
+          >
+            Use Faucet
+          </Button>
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
