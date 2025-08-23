@@ -16,7 +16,14 @@ export const DOMA_CONFIG: DomaConfig = {
   forgeApiUrl: "https://forge.doma.xyz/api",
   contractAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e", // Doma Protocol testnet contract
   chainId: 11155111, // Sepolia testnet
-  websocketUrl: "wss://ws.doma.xyz/alerts",
+  websocketUrl: "wss://api-testnet.doma.xyz/ws",
+}
+
+// Real Doma Protocol API endpoints
+export const DOMA_ENDPOINTS = {
+  subgraph: "https://api-testnet.doma.xyz/graphql",
+  orderbook: "https://api-testnet.doma.xyz/v1/orderbook",
+  websocket: "wss://api-testnet.doma.xyz/ws"
 }
 
 export const DOMA_API_KEY = "v1.d7c6c0712f209fb4c2352d8a4127181359a1324f5f1e8ba60eca3ab75b1d86f9"
