@@ -12,7 +12,7 @@ export interface DomaConfig {
 
 export const DOMA_CONFIG: DomaConfig = {
   testnetUrl: "https://start.doma.xyz",
-  d3ApiUrl: "https://api.d3.app/v1",
+  d3ApiUrl: "https://api-testnet.doma.xyz/v1",
   forgeApiUrl: "https://forge.doma.xyz/api",
   contractAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e", // Doma Protocol testnet contract
   chainId: 11155111, // Sepolia testnet
