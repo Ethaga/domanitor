@@ -48,15 +48,35 @@ export function DomanitorDashboard() {
   useEffect(() => {
     const loadMetrics = async () => {
       try {
-        const data = await DomaAPI.getMarketMetrics()
-        setMetrics(data)
+        console.log("[DomaAPI] Loading real-time metrics from Doma Protocol")
+
+        // Load real-time dashboard statistics and market metrics
+        const [dashboardStats, marketMetrics] = await Promise.all([
+          DomaAPI.getDashboardStats(),
+          DomaAPI.getMarketMetrics()
+        ])
+
+        // Combine real-time data with existing metrics
+        const combinedMetrics = {
+          ...marketMetrics,
+          totalDomains: dashboardStats.totalDomains,
+          activeListings: dashboardStats.activeListings,
+          recentActivity: dashboardStats.recentActivity,
+          priceChange24h: dashboardStats.priceChange24h,
+          newRegistrations24h: dashboardStats.newRegistrations24h,
+          totalVolume: parseFloat(dashboardStats.totalVolume) || marketMetrics.tokenizedValue,
+          lastUpdate: new Date().toISOString()
+        }
+
+        setMetrics(combinedMetrics)
+        console.log("[DomaAPI] Real-time metrics loaded successfully:", combinedMetrics)
       } catch (error) {
-        console.error("[v0] Failed to load Doma metrics:", error)
+        console.error("[DomaAPI] Failed to load real-time Doma metrics:", error)
       }
     }
 
     loadMetrics()
-    const interval = setInterval(loadMetrics, 30000) // Update every 30 seconds
+    const interval = setInterval(loadMetrics, 15000) // Update every 15 seconds for real-time data
     return () => clearInterval(interval)
   }, [])
 
