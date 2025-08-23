@@ -11,7 +11,7 @@ import { Progress } from "@/components/ui/progress"
 import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { DomaAPI, type TokenizationRequest } from "@/lib/doma-api"
-import { Coins, Zap, Shield, ArrowRight, ExternalLink, Layers } from "lucide-react"
+import { Coins, Zap, Shield, ArrowRight, ExternalLink, Layers, DollarSign } from "lucide-react"
 
 interface TokenizationPanelProps {
   walletAddress: string
@@ -146,6 +146,16 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
                   onCheckedChange={setFractionalize}
                   disabled={!isConnected || isTokenizing}
                 />
+              </div>
+
+              <div className="bg-accent/10 border border-accent/20 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <DollarSign className="h-4 w-4 text-accent" />
+                  <span className="font-semibold text-sm">Domain Financing</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Gunakan domain sebagai jaminan pinjaman atau sewa pendanaan
+                </p>
               </div>
 
               {fractionalize && (

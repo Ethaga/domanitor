@@ -24,6 +24,48 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
   useEffect(() => {
     if (isConnected && walletAddress) {
       loadDomains()
+    } else {
+      setDomains([
+        {
+          id: "1",
+          name: "yourname.eth",
+          status: "active",
+          floorPrice: 25000,
+          expirationDate: "2025-12-15",
+          registrar: "ENS",
+          fractionalized: true,
+          totalShares: 1000,
+          availableShares: 250,
+          tokenId: "0x123...",
+          chain: "ethereum",
+        },
+        {
+          id: "2",
+          name: "yourname.sol",
+          status: "active",
+          floorPrice: 15000,
+          expirationDate: "2025-11-20",
+          registrar: "Solana Name Service",
+          fractionalized: false,
+          totalShares: 0,
+          availableShares: 0,
+          tokenId: "0x456...",
+          chain: "solana",
+        },
+        {
+          id: "3",
+          name: "yourname.bnb",
+          status: "pending",
+          floorPrice: 8500,
+          expirationDate: "2025-10-30",
+          registrar: "Space ID",
+          fractionalized: true,
+          totalShares: 500,
+          availableShares: 125,
+          tokenId: "0x789...",
+          chain: "bnb",
+        },
+      ])
     }
   }, [isConnected, walletAddress])
 
@@ -59,6 +101,21 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
     }
   }
 
+  const getChainLogo = (chain: string) => {
+    switch (chain) {
+      case "ethereum":
+        return <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+      case "solana":
+        return <div className="w-4 h-4 bg-purple-500 rounded-full"></div>
+      case "bnb":
+        return <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+      case "cosmos":
+        return <div className="w-4 h-4 bg-indigo-500 rounded-full"></div>
+      default:
+        return <div className="w-4 h-4 bg-gray-500 rounded-full"></div>
+    }
+  }
+
   const filteredDomains = domains.filter((domain) => domain.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   return (
@@ -76,6 +133,10 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
             <Alert className="mb-6">
               <AlertDescription>
                 Connect your wallet to view your tokenized domain portfolio from Doma Protocol.
+                <br />
+                <span className="text-sm text-muted-foreground mt-1 block">
+                  Preview showing cross-chain domain examples (.eth, .sol, .bnb)
+                </span>
               </AlertDescription>
             </Alert>
           )}
@@ -108,83 +169,88 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
             </Alert>
           )}
 
-          {isConnected && (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Domain</TableHead>
+                  <TableHead>Chain</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Floor Price</TableHead>
+                  <TableHead>Expiry</TableHead>
+                  <TableHead>Registrar</TableHead>
+                  <TableHead>Shares</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
                   <TableRow>
-                    <TableHead>Domain</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Floor Price</TableHead>
-                    <TableHead>Expiry</TableHead>
-                    <TableHead>Registrar</TableHead>
-                    <TableHead>Shares</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableCell colSpan={8} className="text-center py-8">
+                      <RefreshCw className="h-4 w-4 animate-spin mx-auto mb-2" />
+                      Loading domains from Doma Protocol...
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8">
-                        <RefreshCw className="h-4 w-4 animate-spin mx-auto mb-2" />
-                        Loading domains from Doma Protocol...
+                ) : filteredDomains.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      {isConnected
+                        ? "No tokenized domains found. Start by tokenizing your first domain!"
+                        : "Connect wallet to view domains"}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredDomains.map((domain) => (
+                    <TableRow key={domain.id}>
+                      <TableCell className="font-medium">{domain.name}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {getChainLogo(domain.chain || "ethereum")}
+                          <span className="text-xs text-muted-foreground capitalize">{domain.chain || "ethereum"}</span>
+                        </div>
                       </TableCell>
-                    </TableRow>
-                  ) : filteredDomains.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                        {isConnected
-                          ? "No tokenized domains found. Start by tokenizing your first domain!"
-                          : "Connect wallet to view domains"}
+                      <TableCell>
+                        <Badge className={getStatusColor(domain.status)}>{domain.status}</Badge>
                       </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredDomains.map((domain) => (
-                      <TableRow key={domain.id}>
-                        <TableCell className="font-medium">{domain.name}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(domain.status)}>{domain.status}</Badge>
-                        </TableCell>
-                        <TableCell className="font-mono">${domain.floorPrice.toLocaleString()}</TableCell>
-                        <TableCell>
+                      <TableCell className="font-mono">${domain.floorPrice.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3 text-muted-foreground" />
+                          {domain.expirationDate}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{domain.registrar}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {domain.fractionalized ? (
                           <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3 text-muted-foreground" />
-                            {domain.expirationDate}
+                            <Layers className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-sm">
+                              {domain.availableShares}/{domain.totalShares}
+                            </span>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{domain.registrar}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          {domain.fractionalized ? (
-                            <div className="flex items-center gap-1">
-                              <Layers className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-sm">
-                                {domain.availableShares}/{domain.totalShares}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">Whole</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="sm" asChild>
-                            <a
-                              href={`https://sepolia.etherscan.io/token/${domain.tokenId}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+                        ) : (
+                          <span className="text-muted-foreground text-sm">Whole</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm" asChild>
+                          <a
+                            href={`https://sepolia.etherscan.io/token/${domain.tokenId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

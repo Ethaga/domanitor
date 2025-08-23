@@ -12,7 +12,18 @@ import { AlertsPanel } from "@/components/alerts-panel"
 import { AnalyticsChart } from "@/components/analytics-chart"
 import { ConnectWallet } from "@/components/connect-wallet"
 import { DomaAPI } from "@/lib/doma-api"
-import { Bell, TrendingUp, Coins, Activity, ExternalLink } from "lucide-react"
+import {
+  Bell,
+  TrendingUp,
+  Coins,
+  Activity,
+  ExternalLink,
+  DollarSign,
+  Sparkles,
+  Shield,
+  Brain,
+  Award,
+} from "lucide-react"
 import Image from "next/image"
 
 export function DomanitorDashboard() {
@@ -55,6 +66,12 @@ export function DomanitorDashboard() {
                 <h1 className="text-2xl font-bold text-foreground">Domanitor</h1>
                 <Badge variant="secondary" className="bg-accent text-accent-foreground">
                   Doma Testnet
+                </Badge>
+              </div>
+              <div className="hidden lg:flex items-center">
+                <Badge variant="outline" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Now Supporting: Ethereum (.eth) | Solana (.sol) | BNB Chain (.bnb) | Cosmos (.cosmos)
                 </Badge>
               </div>
               <Button variant="ghost" size="sm" asChild>
@@ -150,9 +167,70 @@ export function DomanitorDashboard() {
                 ${metrics?.monthlyRevenue ? (metrics.monthlyRevenue / 1000).toFixed(1) + "K" : "..."}
               </div>
               <p className="text-xs text-muted-foreground">Monthly projection</p>
+              <div className="mt-4 space-y-2">
+                <h4 className="font-semibold text-sm flex items-center gap-1">
+                  <Award className="h-3 w-3" />
+                  Keunggulan Domanitor
+                </h4>
+                <div className="space-y-1 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Brain className="h-3 w-3" />
+                    <span>
+                      <strong>AI Valuation Engine:</strong> Prediksi harga domain berbasis ML
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Shield className="h-3 w-3" />
+                    <span>
+                      <strong>Trademark Shield:</strong> Proteksi otomatis anti-squatting
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    <span>
+                      <strong>Enterprise Tools:</strong> Manajemen brand (.com + .web3)
+                    </span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
+
+        {isConnected && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" />
+                Domain Financing
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Nilai Domain (USD)</label>
+                  <input
+                    type="number"
+                    placeholder="10000"
+                    className="w-full px-3 py-2 border rounded-md"
+                    id="domain-value"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Durasi Pinjaman (30-365 hari)</label>
+                  <input type="range" min="30" max="365" defaultValue="90" className="w-full" id="loan-duration" />
+                  <div className="text-xs text-muted-foreground">90 hari</div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Pinjaman Tersedia</label>
+                  <div className="text-2xl font-bold text-green-600">$7,000</div>
+                  <div className="text-xs text-muted-foreground">70% dari nilai domain</div>
+                  <Button className="w-full mt-2">Ajukan Pinjaman</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="monitor" className="space-y-6">
@@ -179,6 +257,22 @@ export function DomanitorDashboard() {
             <AnalyticsChart metrics={metrics} />
           </TabsContent>
         </Tabs>
+
+        <footer className="mt-16 pt-8 border-t border-border">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-4">
+              <Badge variant="outline" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                DomainFi Challenge
+              </Badge>
+              <Button variant="ghost" size="sm" asChild>
+                <a href="/hackathon" className="text-sm">
+                  DomainFi Challenge Submission
+                </a>
+              </Button>
+            </div>
+            <div className="text-xs text-muted-foreground">Built with Doma Protocol • Testnet Only</div>
+          </div>
+        </footer>
       </div>
     </div>
   )

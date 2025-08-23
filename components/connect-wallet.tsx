@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Wallet, ChevronDown, AlertCircle } from "lucide-react"
+import { Wallet, ChevronDown, AlertCircle, Shield } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
@@ -215,23 +215,79 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
     )
   }
 
+  if (!isConnected) {
+    return (
+      <div className="space-y-4">
+        <div className="bg-accent/10 border border-accent rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Shield className="h-4 w-4 text-accent" />
+            <span className="font-semibold text-sm">Decentralized Identity (DID)</span>
+            <Badge variant="outline" className="text-xs">
+              DID
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Verifikasi kepemilikan domain tanpa perantara dengan Decentralized Identity. Setiap domain menjadi identitas
+            digital terenkripsi Anda.
+          </p>
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="flex items-center gap-2" disabled={isConnecting}>
+              <Wallet className="h-4 w-4" />
+              {isConnecting ? "Connecting..." : "Connect Wallet"}
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleConnect("metamask")}>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-orange-500 rounded"></div>
+                MetaMask
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleConnect("okx")}>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-black rounded"></div>
+                OKX Wallet
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleConnect("walletconnect")}>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                WalletConnect
+              </div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    )
+  }
+
   if (isConnected && address) {
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-2 bg-transparent">
-            <Wallet className="h-4 w-4" />
-            <span className="font-mono">{address}</span>
-            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-              {connectedWallet}
-            </Badge>
-            <ChevronDown className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleDisconnect}>Disconnect Wallet</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex items-center gap-2">
+        <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+          <Shield className="h-3 w-3 mr-1" />
+          DID
+        </Badge>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2 bg-transparent">
+              <Wallet className="h-4 w-4" />
+              <span className="font-mono">{address}</span>
+              <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                {connectedWallet}
+              </Badge>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleDisconnect}>Disconnect Wallet</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     )
   }
 
