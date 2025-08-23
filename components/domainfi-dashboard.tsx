@@ -14,6 +14,10 @@ import { AnalyticsChart } from "@/components/analytics-chart"
 import { ConnectWallet } from "@/components/connect-wallet"
 import { DomaAPI } from "@/lib/doma-api"
 import { LiveDataCounter } from "@/components/live-data-counter"
+import { DomaMarketplace } from "@/components/doma-marketplace"
+import { DomaBridge } from "@/components/doma-bridge"
+import { DomaMonitoring } from "@/components/doma-monitoring"
+import { DomaAnalytics } from "@/components/doma-analytics"
 import {
   Bell,
   TrendingUp,
