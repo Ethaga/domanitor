@@ -407,18 +407,52 @@ export class DomaAPI {
   }
 
   static async subscribeToAlerts(walletAddress: string, callback: (alert: any) => void): Promise<WebSocket> {
-    const ws = new WebSocket(`${DOMA_CONFIG.websocketUrl}?wallet=${walletAddress}`)
+    // For development/demo purposes, create a mock WebSocket that simulates alerts
+    // In production, this would connect to the actual Doma Protocol WebSocket
+    console.log('[DomaAPI] Using mock WebSocket for development - wallet:', walletAddress)
 
-    ws.onmessage = (event) => {
-      const alert = JSON.parse(event.data)
-      callback(alert)
+    // Create a mock WebSocket-like object
+    const mockWs = {
+      readyState: 1, // OPEN
+      close: () => {
+        console.log('[DomaAPI] Mock WebSocket closed')
+      },
+      onopen: null as ((event: Event) => void) | null,
+      onmessage: null as ((event: MessageEvent) => void) | null,
+      onerror: null as ((event: Event) => void) | null,
+      onclose: null as ((event: CloseEvent) => void) | null
+    } as WebSocket
+
+    // Simulate connection opening
+    setTimeout(() => {
+      console.log("[v0] Connected to Doma real-time alerts (mock)")
+      if (mockWs.onopen) {
+        mockWs.onopen(new Event('open'))
+      }
+    }, 100)
+
+    // Simulate periodic alerts for demo purposes
+    const alertInterval = setInterval(() => {
+      const mockAlert = {
+        type: ['expiration', 'transfer', 'sale', 'price_change'][Math.floor(Math.random() * 4)],
+        domain: ['crypto.com', 'defi.xyz', 'nft.io', 'web3.domain'][Math.floor(Math.random() * 4)],
+        message: 'Mock alert for demonstration',
+        severity: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
+        timestamp: new Date().toISOString(),
+        metadata: { mockData: true }
+      }
+
+      callback(mockAlert)
+    }, 30000) // Send mock alert every 30 seconds
+
+    // Clean up interval when WebSocket is closed
+    const originalClose = mockWs.close
+    mockWs.close = () => {
+      clearInterval(alertInterval)
+      originalClose.call(mockWs)
     }
 
-    ws.onopen = () => {
-      console.log("[v0] Connected to Doma real-time alerts")
-    }
-
-    return ws
+    return mockWs
   }
 
   static async fractionalizeDomain(
