@@ -355,11 +355,14 @@ export function DomanitorDashboard() {
 
           {/* Main Dashboard Tabs */}
           <Tabs defaultValue="monitor" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="monitor">Domain Portfolio</TabsTrigger>
-              <TabsTrigger value="tokenize">Tokenize & Fractionalize</TabsTrigger>
-              <TabsTrigger value="alerts">Alert Bots</TabsTrigger>
-              <TabsTrigger value="analytics">On-Chain Analytics</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-7">
+              <TabsTrigger value="monitor">Portfolio</TabsTrigger>
+              <TabsTrigger value="tokenize">Tokenize</TabsTrigger>
+              <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
+              <TabsTrigger value="bridge">Bridge</TabsTrigger>
+              <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="alerts">Alerts</TabsTrigger>
             </TabsList>
 
             <TabsContent value="monitor" className="space-y-6">
@@ -370,12 +373,24 @@ export function DomanitorDashboard() {
               <TokenizationPanel walletAddress={walletAddress} isConnected={isConnected} />
             </TabsContent>
 
-            <TabsContent value="alerts" className="space-y-6">
-              <AlertsPanel walletAddress={walletAddress} isConnected={isConnected} />
+            <TabsContent value="marketplace" className="space-y-6">
+              <DomaMarketplace walletAddress={walletAddress} isConnected={isConnected} />
+            </TabsContent>
+
+            <TabsContent value="bridge" className="space-y-6">
+              <DomaBridge walletAddress={walletAddress} isConnected={isConnected} />
+            </TabsContent>
+
+            <TabsContent value="monitoring" className="space-y-6">
+              <DomaMonitoring walletAddress={walletAddress} isConnected={isConnected} />
             </TabsContent>
 
             <TabsContent value="analytics" className="space-y-6">
-              <AnalyticsChart metrics={metrics} />
+              <DomaAnalytics walletAddress={walletAddress} isConnected={isConnected} />
+            </TabsContent>
+
+            <TabsContent value="alerts" className="space-y-6">
+              <AlertsPanel walletAddress={walletAddress} isConnected={isConnected} />
             </TabsContent>
           </Tabs>
 
