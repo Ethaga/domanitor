@@ -1,11 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExternalLink, Shield, Zap, Globe } from "lucide-react"
+import { DomaApiReference } from "@/components/doma-api-reference"
+import { DomaSubgraphApi } from "@/components/doma-subgraph-api"
+import { DomaPollApi } from "@/components/doma-poll-api"
+import { DomaOrderbookApi } from "@/components/doma-orderbook-api"
+import { DomaFractionalizationApi } from "@/components/doma-fractionalization-api"
 
 export default function IntegrationPage() {
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="max-w-6xl mx-auto py-8 px-4">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-4">Doma Protocol Integration</h1>
         <p className="text-gray-600 text-lg">
@@ -115,6 +121,39 @@ export default function IntegrationPage() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-6">Complete API Reference</h2>
+        <Tabs defaultValue="smart-contracts" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="smart-contracts">Smart Contracts</TabsTrigger>
+            <TabsTrigger value="subgraph">Subgraph</TabsTrigger>
+            <TabsTrigger value="poll">Poll API</TabsTrigger>
+            <TabsTrigger value="orderbook">Orderbook</TabsTrigger>
+            <TabsTrigger value="fractionalization">Fractionalization</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="smart-contracts" className="mt-6">
+            <DomaApiReference />
+          </TabsContent>
+
+          <TabsContent value="subgraph" className="mt-6">
+            <DomaSubgraphApi />
+          </TabsContent>
+
+          <TabsContent value="poll" className="mt-6">
+            <DomaPollApi />
+          </TabsContent>
+
+          <TabsContent value="orderbook" className="mt-6">
+            <DomaOrderbookApi />
+          </TabsContent>
+
+          <TabsContent value="fractionalization" className="mt-6">
+            <DomaFractionalizationApi />
+          </TabsContent>
+        </Tabs>
+      </div>
 
       {/* Testnet Information */}
       <Card>

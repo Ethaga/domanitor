@@ -17,6 +17,8 @@ export const DOMA_CONFIG: DomaConfig = {
   websocketUrl: "wss://ws.doma.xyz/alerts",
 }
 
+export const DOMA_API_KEY = "v1.d7c6c0712f209fb4c2352d8a4127181359a1324f5f1e8ba60eca3ab75b1d86f9"
+
 export interface DomainToken {
   id: string
   name: string
@@ -109,7 +111,8 @@ export class DomaAPI {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": "doma-testnet-key",
+          "X-API-Key": DOMA_API_KEY,
+          Authorization: `Bearer ${DOMA_API_KEY}`,
         },
         body: JSON.stringify({
           domain: request.domain,
