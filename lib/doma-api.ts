@@ -180,40 +180,27 @@ export class DomaAPI {
   static async tokenizeDomain(
     request: TokenizationRequest,
   ): Promise<{ success: boolean; txHash?: string; tokenId?: string; error?: string }> {
-    console.log("[v0] Tokenizing domain via Doma Protocol:", request)
+    console.log("[v0] Tokenizing domain via Doma Protocol (mock):", request)
 
     try {
-      // Simulate real API call to Doma testnet
-      const response = await fetch(`${DOMA_CONFIG.d3ApiUrl}/domains/tokenize`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": DOMA_API_KEY,
-          Authorization: `Bearer ${DOMA_API_KEY}`,
-        },
-        body: JSON.stringify({
-          domain: request.domain,
-          owner: request.walletAddress,
-          registrar: request.registrar,
-          fractionalize: request.fractionalize,
-          shares: request.totalShares,
-        }),
-      })
+      // For development/demo purposes, simulate the tokenization process
+      // In production, this would make actual API calls to Doma Protocol
+      console.log("[DomaAPI] Simulating domain tokenization for development")
 
-      // Simulate transaction processing
+      // Simulate transaction processing time
       await new Promise((resolve) => setTimeout(resolve, 3000))
 
       const tokenId = `doma_${Math.random().toString(36).substr(2, 9)}`
 
       return {
-        success: Math.random() > 0.15, // 85% success rate for testnet
+        success: Math.random() > 0.15, // 85% success rate for testnet simulation
         txHash: `0x${Math.random().toString(16).substr(2, 64)}`,
         tokenId: tokenId,
       }
     } catch (error) {
       return {
         success: false,
-        error: "Failed to connect to Doma Protocol testnet",
+        error: "Tokenization simulation failed",
       }
     }
   }
