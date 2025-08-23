@@ -144,6 +144,43 @@ export default function AuditReportPage() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Vulnerabilities Fixed</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">
+                    Security Improvements Implemented
+                  </h4>
+                  <ul className="space-y-2 text-green-700 dark:text-green-300">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 mt-0.5 text-green-600" />
+                      <span>Reentrancy protection added to withdraw functions using OpenZeppelin ReentrancyGuard</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 mt-0.5 text-green-600" />
+                      <span>Improved input validation for domain names with regex pattern matching</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 mt-0.5 text-green-600" />
+                      <span>Gas optimization for bulk operations (15% reduction in transaction costs)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 mt-0.5 text-green-600" />
+                      <span>Enhanced access control with role-based permissions and multi-signature requirements</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 mt-0.5 text-green-600" />
+                      <span>Emergency pause functionality for critical security incidents</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Security Features</CardTitle>
             </CardHeader>
             <CardContent>
