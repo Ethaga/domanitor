@@ -108,6 +108,13 @@ export function DomanitorDashboard() {
                   <Badge variant="secondary" className="bg-accent text-accent-foreground">
                     Doma Testnet
                   </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                  >
+                    <Activity className="h-3 w-3 mr-1 animate-pulse" />
+                    Live Data
+                  </Badge>
                 </div>
                 <div className="hidden lg:flex items-center">
                   <Badge variant="outline" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
