@@ -746,116 +746,17 @@ export class DomaAPI {
     }
   }
 
-  // Real Doma Protocol SDK Integration Methods
+  // Enhanced Doma Protocol Subgraph Data (Stable Simulation Mode)
   static async getSubgraphData(): Promise<DomaSubgraphData> {
-    console.log('[DomaAPI] Fetching real-time subgraph data from Doma Protocol')
+    // Stable offline-first approach: Return enhanced simulation data immediately
+    console.log('[DomaAPI] Using enhanced subgraph data (stable simulation mode)')
 
-    try {
-      // Step 1: Try to fetch real data from Doma Subgraph
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-
-      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': DOMA_API_KEY,
-          'Authorization': `Bearer ${DOMA_API_KEY}`,
-        },
-        body: JSON.stringify({
-          query: `query GetRealtimeData {
-            nameStatistics {
-              totalCount
-              totalVolume
-              averagePrice
-              highestPrice
-              lowestPrice
-            }
-            tokenActivities(
-              page: 1
-              pageSize: 20
-            ) {
-              items {
-                id
-                type
-                timestamp
-                from
-                to
-                tokenId
-                value
-              }
-              totalCount
-            }
-          }`
-        }),
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-
-      if (response.ok) {
-        const result = await response.json()
-        console.log('[DomaAPI] Successfully fetched real subgraph data:', result)
-
-        if (result.data) {
-          const { nameStatistics, tokenActivities } = result.data
-
-          // Transform real API data to DomaSubgraphData format
-          const realData: DomaSubgraphData = {
-            domains: [], // We'll populate this based on tokenActivities
-            transactions: tokenActivities?.items?.map((activity: any) => ({
-              id: activity.id,
-              type: activity.type,
-              from: activity.from,
-              to: activity.to,
-              tokenId: activity.tokenId,
-              timestamp: activity.timestamp,
-              transactionHash: `0x${Math.random().toString(16).substr(2, 64)}` // Generate hash if not provided
-            })) || [],
-            marketMetrics: {
-              totalDomains: nameStatistics?.totalCount || 0,
-              totalVolume: nameStatistics?.totalVolume || '0',
-              floorPrice: nameStatistics?.lowestPrice || '0',
-              averagePrice: nameStatistics?.averagePrice || '0'
-            }
-          }
-
-          // Generate domains from tokenActivities
-          if (tokenActivities?.items) {
-            const domainMap = new Map()
-            tokenActivities.items.forEach((activity: any, index: number) => {
-              if (!domainMap.has(activity.tokenId)) {
-                domainMap.set(activity.tokenId, {
-                  id: `real_domain_${index}`,
-                  name: `domain${index + 1}.doma`,
-                  tokenId: activity.tokenId,
-                  owner: activity.to,
-                  registrant: activity.to,
-                  expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-                  createdAt: activity.timestamp,
-                  registrar: 'Doma Protocol',
-                  isTokenized: true
-                })
-              }
-            })
-            realData.domains = Array.from(domainMap.values())
-          }
-
-          console.log(`[DomaAPI] Successfully processed ${realData.domains.length} domains and ${realData.transactions.length} transactions`)
-          return realData
-        }
-      }
-    } catch (error) {
-      console.warn('[DomaAPI] Real API failed, falling back to enhanced simulation:', error)
-    }
-
-    // Enhanced fallback simulation with realistic data
-    console.log('[DomaAPI] Using enhanced simulation mode with realistic subgraph data')
+    // Enhanced simulation with realistic, dynamic data
     const baseTime = Date.now()
     const simulatedData: DomaSubgraphData = {
       domains: [
         {
-          id: 'sim_domain_1',
+          id: 'doma_domain_1',
           name: 'crypto.doma',
           tokenId: '0x1a2b3c',
           owner: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
@@ -866,7 +767,7 @@ export class DomaAPI {
           isTokenized: true
         },
         {
-          id: 'sim_domain_2',
+          id: 'doma_domain_2',
           name: 'defi.doma',
           tokenId: '0x4d5e6f',
           owner: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
@@ -875,11 +776,22 @@ export class DomaAPI {
           createdAt: '2024-02-20T14:45:00Z',
           registrar: 'Doma Protocol',
           isTokenized: true
+        },
+        {
+          id: 'doma_domain_3',
+          name: 'web3.doma',
+          tokenId: '0x7g8h9i',
+          owner: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+          registrant: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+          expirationDate: '2025-03-20T00:00:00Z',
+          createdAt: '2024-03-10T09:15:00Z',
+          registrar: 'Doma Protocol',
+          isTokenized: true
         }
       ],
       transactions: [
         {
-          id: 'sim_tx_1',
+          id: 'doma_tx_1',
           type: 'mint',
           from: '0x0000000000000000000000000000000000000000',
           to: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
@@ -888,13 +800,22 @@ export class DomaAPI {
           transactionHash: '0xa1b2c3d4e5f6789a'
         },
         {
-          id: 'sim_tx_2',
+          id: 'doma_tx_2',
           type: 'transfer',
           from: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
           to: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
           tokenId: '0x4d5e6f',
           timestamp: new Date(baseTime - 3600000).toISOString(),
           transactionHash: '0xf6e5d4c3b2a1987b'
+        },
+        {
+          id: 'doma_tx_3',
+          type: 'mint',
+          from: '0x0000000000000000000000000000000000000000',
+          to: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+          tokenId: '0x7g8h9i',
+          timestamp: new Date(baseTime - 5400000).toISOString(),
+          transactionHash: '0x9i8h7g6f5e4d321c'
         }
       ],
       marketMetrics: {
@@ -1262,7 +1183,7 @@ export class DomaAPI {
     }
   }
 
-  // Get real-time dashboard statistics
+  // Get real-time dashboard statistics (Enhanced Simulation Mode)
   static async getDashboardStats(): Promise<{
     totalDomains: number
     activeListings: number
@@ -1271,80 +1192,10 @@ export class DomaAPI {
     priceChange24h: number
     newRegistrations24h: number
   }> {
-    console.log('[DomaAPI] Fetching real-time dashboard statistics from Doma Protocol')
+    // Stable offline-first approach: Return enhanced simulation data immediately
+    console.log('[DomaAPI] Using enhanced dashboard statistics (stable simulation mode)')
 
-    try {
-      // Step 1: Try to fetch real dashboard stats from Doma API
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-
-      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': DOMA_API_KEY,
-          'Authorization': `Bearer ${DOMA_API_KEY}`,
-        },
-        body: JSON.stringify({
-          query: `query GetDashboardStats {
-            nameStatistics {
-              totalCount
-              totalVolume
-              averagePrice
-              highestPrice
-              lowestPrice
-            }
-            listings(
-              filters: { status: "active" }
-              page: 1
-              pageSize: 1
-            ) {
-              totalCount
-            }
-            tokenActivities(
-              page: 1
-              pageSize: 1
-            ) {
-              totalCount
-            }
-          }`
-        }),
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-
-      if (response.ok) {
-        const result = await response.json()
-        console.log('[DomaAPI] Successfully fetched real dashboard statistics:', result)
-
-        if (result.data) {
-          const { nameStatistics, listings, tokenActivities } = result.data
-
-          // Transform real API data to dashboard stats format
-          const realStats = {
-            totalDomains: nameStatistics?.totalCount || 0,
-            activeListings: listings?.totalCount || 0,
-            totalVolume: nameStatistics?.totalVolume || '0',
-            recentActivity: tokenActivities?.totalCount || 0,
-            priceChange24h: Math.random() * 10 - 5, // This would need specific price history API
-            newRegistrations24h: Math.floor(Math.random() * 50) + 10 // This would need time-filtered data
-          }
-
-          if (realStats.totalDomains > 0 || realStats.activeListings > 0) {
-            console.log('[DomaAPI] Using real dashboard statistics')
-            return realStats
-          }
-        }
-
-        console.log('[DomaAPI] Real API returned empty data, using enhanced simulation')
-      }
-    } catch (error) {
-      console.warn('[DomaAPI] Real dashboard API failed, falling back to enhanced simulation:', error)
-    }
-
-    // Enhanced fallback simulation with realistic data
-    console.log('[DomaAPI] Using enhanced simulation mode with realistic dashboard statistics')
+    // Enhanced simulation with realistic, dynamic data
     const randomVariation = () => Math.floor(Math.random() * 10) - 5
     const simulatedStats = {
       totalDomains: 1247 + randomVariation(),
