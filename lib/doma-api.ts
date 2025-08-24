@@ -334,38 +334,6 @@ export class DomaAPI {
     return simulatedDomains
   }
 
-  // Background method to optionally enhance user domain data (non-blocking)
-  private static async tryEnhanceUserDomains(walletAddress: string): Promise<void> {
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 second timeout
-
-      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': DOMA_API_KEY,
-        },
-        body: JSON.stringify({
-          query: `query GetUserDomains($owner: String!) {
-            names(filter: { currentOwner: { address: $owner } }) { id name }
-          }`,
-          variables: { owner: walletAddress }
-        }),
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-
-      if (response.ok) {
-        const result = await response.json()
-        console.log('[DomaAPI] Successfully enhanced user domains with real data:', result)
-      }
-    } catch (error) {
-      // Silent failure - this is expected in development/demo mode
-      // Do not throw or log errors to avoid console pollution
-    }
-  }
 
   static async createAlert(subscription: Omit<AlertSubscription, "id">): Promise<AlertSubscription> {
     return {
@@ -757,36 +725,6 @@ export class DomaAPI {
     return simulatedData
   }
 
-  // Background method to optionally enhance subgraph data (non-blocking)
-  private static async tryEnhanceSubgraphData(): Promise<void> {
-    try {
-      // Add timeout to prevent hanging
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 second timeout
-
-      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': DOMA_API_KEY,
-        },
-        body: JSON.stringify({
-          query: `query { nameStatistics { totalCount totalVolume } }`
-        }),
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-
-      if (response.ok) {
-        const result = await response.json()
-        console.log('[DomaAPI] Successfully enhanced subgraph with real data:', result)
-      }
-    } catch (error) {
-      // Silent failure - this is expected in development/demo mode
-      // Do not throw or log errors to avoid console pollution
-    }
-  }
 
   static async createDomainListing(
     domain: string,
@@ -887,35 +825,6 @@ export class DomaAPI {
     return marketplaceListings
   }
 
-  // Background method to optionally enhance marketplace data (non-blocking)
-  private static async tryEnhanceMarketplaceListings(): Promise<void> {
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 second timeout
-
-      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': DOMA_API_KEY,
-        },
-        body: JSON.stringify({
-          query: `query { listings(filter: { status: "active" }) { id } }`
-        }),
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-
-      if (response.ok) {
-        const result = await response.json()
-        console.log('[DomaAPI] Successfully enhanced marketplace with real data:', result)
-      }
-    } catch (error) {
-      // Silent failure - this is expected in development/demo mode
-      // Do not throw or log errors to avoid console pollution
-    }
-  }
 
   static async createDomainOffer(
     domain: string,
