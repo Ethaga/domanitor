@@ -1044,37 +1044,6 @@ export class DomaAPI {
     return simulatedStats
   }
 
-  // Background method to optionally enhance data (non-blocking)
-  private static async tryEnhanceWithRealData(): Promise<void> {
-    try {
-      // Add timeout to prevent hanging
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
-
-      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': DOMA_API_KEY,
-        },
-        body: JSON.stringify({
-          query: `query { nameStatistics { totalCount totalVolume } }`
-        }),
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-
-      if (response.ok) {
-        const result = await response.json()
-        console.log('[DomaAPI] Successfully enhanced with real data:', result)
-        // In a real implementation, you could update a cache or state here
-      }
-    } catch (error) {
-      // Silent failure - this is expected in development/demo mode
-      // Do not throw or log errors to avoid console pollution
-    }
-  }
 
   // Get live network status (Enhanced Simulation Mode)
   static async getNetworkStatus(): Promise<{
