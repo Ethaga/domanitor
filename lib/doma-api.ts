@@ -919,8 +919,8 @@ export class DomaAPI {
     ]
 
     // Optional: Try to enhance with real data in background (non-blocking)
-    this.tryEnhanceMarketplaceListings().catch(error => {
-      console.log('[DomaAPI] Background marketplace enhancement failed (expected):', error.message)
+    this.tryEnhanceMarketplaceListings().catch(() => {
+      // Silent background enhancement - no logging needed
     })
 
     return marketplaceListings
@@ -951,7 +951,8 @@ export class DomaAPI {
         console.log('[DomaAPI] Successfully enhanced marketplace with real data:', result)
       }
     } catch (error) {
-      throw new Error('Real marketplace enhancement failed (using simulation)')
+      // Silent failure - this is expected in development/demo mode
+      // Do not throw or log errors to avoid console pollution
     }
   }
 
