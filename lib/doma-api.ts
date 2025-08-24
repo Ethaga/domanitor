@@ -332,8 +332,8 @@ export class DomaAPI {
     ]
 
     // Optional: Try to enhance with real data in background (non-blocking)
-    this.tryEnhanceUserDomains(walletAddress).catch(error => {
-      console.log('[DomaAPI] Background user domains enhancement failed (expected):', error.message)
+    this.tryEnhanceUserDomains(walletAddress).catch(() => {
+      // Silent background enhancement - no logging needed
     })
 
     return userDomains
@@ -367,7 +367,8 @@ export class DomaAPI {
         console.log('[DomaAPI] Successfully enhanced user domains with real data:', result)
       }
     } catch (error) {
-      throw new Error('Real user domains enhancement failed (using simulation)')
+      // Silent failure - this is expected in development/demo mode
+      // Do not throw or log errors to avoid console pollution
     }
   }
 
