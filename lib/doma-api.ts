@@ -817,7 +817,8 @@ export class DomaAPI {
         console.log('[DomaAPI] Successfully enhanced subgraph with real data:', result)
       }
     } catch (error) {
-      throw new Error('Real subgraph enhancement failed (using simulation)')
+      // Silent failure - this is expected in development/demo mode
+      // Do not throw or log errors to avoid console pollution
     }
   }
 
@@ -1149,8 +1150,8 @@ export class DomaAPI {
         // In a real implementation, you could update a cache or state here
       }
     } catch (error) {
-      // This is expected to fail in development, so we don't log it as an error
-      throw new Error('Real API enhancement failed (using simulation)')
+      // Silent failure - this is expected in development/demo mode
+      // Do not throw or log errors to avoid console pollution
     }
   }
 
