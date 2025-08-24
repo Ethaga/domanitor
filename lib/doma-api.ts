@@ -784,8 +784,8 @@ export class DomaAPI {
     }
 
     // Optional: Try to enhance with real data in background (non-blocking)
-    this.tryEnhanceSubgraphData().catch(error => {
-      console.log('[DomaAPI] Background subgraph enhancement failed (expected):', error.message)
+    this.tryEnhanceSubgraphData().catch(() => {
+      // Silent background enhancement - no logging needed
     })
 
     return enhancedData
@@ -1116,8 +1116,8 @@ export class DomaAPI {
     }
 
     // Optional: Try to enhance with real data in background (non-blocking)
-    this.tryEnhanceWithRealData().catch(error => {
-      console.log('[DomaAPI] Background real data enhancement failed (expected):', error.message)
+    this.tryEnhanceWithRealData().catch(() => {
+      // Silent background enhancement - no logging needed
     })
 
     return enhancedStats
