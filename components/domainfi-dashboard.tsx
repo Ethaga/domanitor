@@ -71,7 +71,7 @@ export function DomanitorDashboard() {
         setMetrics(combinedMetrics)
         console.log("[DomaAPI] Enhanced simulation metrics loaded successfully:", combinedMetrics)
       } catch (error) {
-        console.error("[DomaAPI] Failed to load real-time Doma metrics:", error)
+        console.error("[DomaAPI] Failed to load enhanced Doma metrics:", error)
       }
     }
 
