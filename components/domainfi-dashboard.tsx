@@ -76,7 +76,7 @@ export function DomanitorDashboard() {
     }
 
     loadMetrics()
-    const interval = setInterval(loadMetrics, 15000) // Update every 15 seconds for real-time data
+    const interval = setInterval(loadMetrics, 30000) // Update every 30 seconds for simulation data
     return () => clearInterval(interval)
   }, [])
 
