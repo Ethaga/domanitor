@@ -32,6 +32,8 @@ import {
   Info,
   Clock,
   ArrowUpRight,
+  Github,
+  Twitter,
 } from "lucide-react"
 import Image from "next/image"
 
@@ -93,11 +95,19 @@ export function DomanitorDashboard() {
         {/* Header */}
         <header className="border-b border-border bg-card">
           <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+              {/* Logo and Title Section */}
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Image src="/domanitor-logo.png" alt="Domanitor Logo" width={32} height={32} className="h-8 w-8" />
-                  <h1 className="text-2xl font-bold text-foreground">Domanitor</h1>
+                <div className="flex items-center space-x-3">
+                  <Image src="/domanitor-logo.png" alt="Domanitor Logo" width={40} height={40} className="h-10 w-10" />
+                  <div className="flex flex-col">
+                    <h1 className="text-2xl font-bold text-foreground leading-tight">Domanitor</h1>
+                    <p className="text-xs text-muted-foreground">Domain Tokenization Platform</p>
+                  </div>
+                </div>
+
+                {/* Status Badges */}
+                <div className="hidden md:flex items-center space-x-2">
                   <Badge
                     variant="secondary"
                     className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
@@ -116,12 +126,48 @@ export function DomanitorDashboard() {
                     Demo Mode
                   </Badge>
                 </div>
-                <div className="hidden lg:flex items-center">
-                  <Badge variant="outline" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    Now Supporting: Ethereum (.eth) | Solana (.sol) | BNB Chain (.bnb) | Cosmos (.cosmos)
-                  </Badge>
+              </div>
+
+              {/* Support Badge */}
+              <div className="hidden xl:flex items-center">
+                <Badge variant="outline" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Supporting: Ethereum (.eth) | Solana (.sol) | BNB Chain (.bnb) | Cosmos (.cosmos)
+                </Badge>
+              </div>
+
+              {/* Right Side Actions */}
+              <div className="flex items-center space-x-2">
+                {/* Social Links */}
+                <div className="flex items-center space-x-1">
+                  <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+                    <a
+                      href="https://x.com/domanitor"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center"
+                      title="Follow us on X (Twitter)"
+                    >
+                      <Twitter className="h-4 w-4" />
+                    </a>
+                  </Button>
+                  <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+                    <a
+                      href="https://github.com/Ethaga/domanitor"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center"
+                      title="View source code on GitHub"
+                    >
+                      <Github className="h-4 w-4" />
+                    </a>
+                  </Button>
                 </div>
+
+                {/* Separator */}
+                <div className="h-6 w-px bg-border" />
+
+                {/* Doma Protocol Link */}
                 <Button variant="ghost" size="sm" asChild>
                   <a
                     href="https://start.doma.xyz"
@@ -133,19 +179,41 @@ export function DomanitorDashboard() {
                     Doma Protocol
                   </a>
                 </Button>
-              </div>
 
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
+                {/* Notifications */}
+                <Button variant="ghost" size="icon" className="relative h-8 w-8">
+                  <Bell className="h-4 w-4" />
                   {notifications > 0 && (
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-xs">
+                    <Badge className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-xs flex items-center justify-center">
                       {notifications}
                     </Badge>
                   )}
                 </Button>
+
+                {/* Wallet Connection */}
                 <ConnectWallet isConnected={isConnected} onConnect={handleWalletConnect} />
               </div>
+            </div>
+
+            {/* Mobile Status Badges */}
+            <div className="md:hidden flex items-center space-x-2 mt-3">
+              <Badge
+                variant="secondary"
+                className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+              >
+                <Shield className="h-3 w-3 mr-1" />
+                Audited
+              </Badge>
+              <Badge variant="secondary" className="bg-accent text-accent-foreground">
+                Doma Testnet
+              </Badge>
+              <Badge
+                variant="secondary"
+                className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+              >
+                <Activity className="h-3 w-3 mr-1" />
+                Demo Mode
+              </Badge>
             </div>
           </div>
         </header>
