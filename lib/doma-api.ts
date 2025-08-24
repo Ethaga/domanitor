@@ -331,10 +331,8 @@ export class DomaAPI {
       }
     ]
 
-    // Optional: Try to enhance with real data in background (non-blocking)
-    this.tryEnhanceUserDomains(walletAddress).catch(() => {
-      // Silent background enhancement - no logging needed
-    })
+    // Background enhancement disabled to prevent fetch errors in demo mode
+    // this.tryEnhanceUserDomains(walletAddress).catch(() => {})
 
     return userDomains
   }
@@ -784,10 +782,8 @@ export class DomaAPI {
       }
     }
 
-    // Optional: Try to enhance with real data in background (non-blocking)
-    this.tryEnhanceSubgraphData().catch(() => {
-      // Silent background enhancement - no logging needed
-    })
+    // Background enhancement disabled to prevent fetch errors in demo mode
+    // this.tryEnhanceSubgraphData().catch(() => {})
 
     return enhancedData
   }
@@ -919,10 +915,8 @@ export class DomaAPI {
       }
     ]
 
-    // Optional: Try to enhance with real data in background (non-blocking)
-    this.tryEnhanceMarketplaceListings().catch(() => {
-      // Silent background enhancement - no logging needed
-    })
+    // Background enhancement disabled to prevent fetch errors in demo mode
+    // this.tryEnhanceMarketplaceListings().catch(() => {})
 
     return marketplaceListings
   }
@@ -1117,10 +1111,8 @@ export class DomaAPI {
       newRegistrations24h: 23 + Math.floor(randomVariation() / 3)
     }
 
-    // Optional: Try to enhance with real data in background (non-blocking)
-    this.tryEnhanceWithRealData().catch(() => {
-      // Silent background enhancement - no logging needed
-    })
+    // Background enhancement disabled to prevent fetch errors in demo mode
+    // this.tryEnhanceWithRealData().catch(() => {})
 
     return enhancedStats
   }
