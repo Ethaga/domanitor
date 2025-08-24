@@ -112,8 +112,8 @@ export function DomanitorDashboard() {
                     variant="secondary"
                     className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
                   >
-                    <Activity className="h-3 w-3 mr-1 animate-pulse" />
-                    Live Data
+                    <Activity className="h-3 w-3 mr-1" />
+                    Demo Mode
                   </Badge>
                 </div>
                 <div className="hidden lg:flex items-center">
