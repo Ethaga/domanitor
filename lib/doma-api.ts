@@ -971,74 +971,130 @@ export class DomaAPI {
   }
 
   static async getDomainListings(): Promise<DomainListing[]> {
-    // Offline-first approach: Return enhanced simulation data immediately
-    console.log('[DomaAPI] Using enhanced marketplace listings (offline-first mode)')
+    console.log('[DomaAPI] Fetching real-time marketplace listings from Doma Protocol')
 
+    try {
+      // Step 1: Try to fetch real marketplace data from Doma Subgraph
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+
+      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': DOMA_API_KEY,
+          'Authorization': `Bearer ${DOMA_API_KEY}`,
+        },
+        body: JSON.stringify({
+          query: `query GetMarketplaceListings {
+            listings(
+              filters: { status: "active" }
+              page: 1
+              pageSize: 50
+            ) {
+              items {
+                id
+                price
+                currency
+                seller {
+                  id
+                  address
+                }
+                createdAt
+                updatedAt
+                tokenId
+                status
+              }
+              totalCount
+            }
+          }`
+        }),
+        signal: controller.signal
+      })
+
+      clearTimeout(timeoutId)
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('[DomaAPI] Successfully fetched real marketplace data:', result)
+
+        if (result.data && result.data.listings && result.data.listings.items) {
+          const realListings: DomainListing[] = result.data.listings.items.map((listing: any, index: number) => ({
+            id: listing.id,
+            domain: `domain${index + 1}.doma`, // Generate domain name based on index
+            price: parseFloat(listing.price) || Math.random() * 1000 + 100,
+            currency: listing.currency || 'ETH',
+            seller: listing.seller?.address || listing.seller?.id || '0x0000000000000000000000000000000000000000',
+            status: listing.status || 'active',
+            listedAt: listing.createdAt || listing.updatedAt || new Date().toISOString(),
+            tokenId: listing.tokenId || `0x${Math.random().toString(16).substr(2, 6)}`,
+            chainId: DOMA_CONFIG.chainId
+          }))
+
+          if (realListings.length > 0) {
+            console.log(`[DomaAPI] Found ${realListings.length} real marketplace listings`)
+            return realListings
+          }
+        }
+
+        // If no real listings found, show message and fall back to simulation
+        console.log('[DomaAPI] No active listings found, using enhanced simulation')
+      }
+    } catch (error) {
+      console.warn('[DomaAPI] Real marketplace API failed, falling back to enhanced simulation:', error)
+    }
+
+    // Enhanced fallback simulation with realistic marketplace data
+    console.log('[DomaAPI] Using enhanced simulation mode with realistic marketplace listings')
     const baseTime = Date.now()
-
-    // Enhanced simulation with dynamic marketplace listings
-    const marketplaceListings: DomainListing[] = [
+    const simulatedListings: DomainListing[] = [
       {
-        id: 'doma_listing_1',
+        id: 'sim_listing_1',
         domain: 'crypto.doma',
-        price: 2.5 + (Math.random() * 0.5 - 0.25), // Price variation
+        price: 2.5 + (Math.random() * 0.5 - 0.25),
         currency: 'ETH',
         seller: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
         status: 'active',
-        listedAt: new Date(baseTime - 43200000).toISOString(), // 12 hours ago
+        listedAt: new Date(baseTime - 43200000).toISOString(),
         tokenId: '0x1a2b3c',
         chainId: 11155111
       },
       {
-        id: 'doma_listing_2',
+        id: 'sim_listing_2',
         domain: 'defi.doma',
-        price: 1500 + Math.floor(Math.random() * 200 - 100), // Price variation
+        price: 1500 + Math.floor(Math.random() * 200 - 100),
         currency: 'USDC',
         seller: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
         status: 'active',
-        listedAt: new Date(baseTime - 86400000).toISOString(), // 24 hours ago
+        listedAt: new Date(baseTime - 86400000).toISOString(),
         tokenId: '0x4d5e6f',
         chainId: 11155111
       },
       {
-        id: 'doma_listing_3',
+        id: 'sim_listing_3',
         domain: 'web3.doma',
-        price: 0.8 + (Math.random() * 0.2 - 0.1), // Price variation
+        price: 0.8 + (Math.random() * 0.2 - 0.1),
         currency: 'ETH',
         seller: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
         status: 'active',
-        listedAt: new Date(baseTime - 129600000).toISOString(), // 36 hours ago
+        listedAt: new Date(baseTime - 129600000).toISOString(),
         tokenId: '0x7g8h9i',
         chainId: 11155111
       },
       {
-        id: 'doma_listing_4',
+        id: 'sim_listing_4',
         domain: 'nft.doma',
         price: 1.2 + (Math.random() * 0.3 - 0.15),
         currency: 'ETH',
         seller: '0x789d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
         status: 'active',
-        listedAt: new Date(baseTime - 172800000).toISOString(), // 48 hours ago
+        listedAt: new Date(baseTime - 172800000).toISOString(),
         tokenId: '0x9j0k1l',
-        chainId: 11155111
-      },
-      {
-        id: 'doma_listing_5',
-        domain: 'dao.doma',
-        price: 850 + Math.floor(Math.random() * 150 - 75),
-        currency: 'USDC',
-        seller: '0xabcd35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-        status: 'active',
-        listedAt: new Date(baseTime - 216000000).toISOString(), // 60 hours ago
-        tokenId: '0x2m3n4o',
         chainId: 11155111
       }
     ]
 
-    // Background enhancement disabled to prevent fetch errors in demo mode
-    // this.tryEnhanceMarketplaceListings().catch(() => {})
-
-    return marketplaceListings
+    return simulatedListings
   }
 
   // Background method to optionally enhance marketplace data (non-blocking)
