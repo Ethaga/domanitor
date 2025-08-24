@@ -219,13 +219,13 @@ export function DomanitorDashboard() {
         </header>
 
         {/* Main Content */}
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6 lg:py-8">
           {!isConnected && (
-            <Alert className="mb-6 border-accent bg-accent/10">
+            <Alert className="mb-6 border-accent bg-accent/10 rounded-lg">
               <Activity className="h-4 w-4" />
-              <AlertDescription>
+              <AlertDescription className="text-sm">
                 Connect your wallet to access Domanitor features and start tokenizing domains on Doma testnet.
-                <strong> All transactions are on testnet - no real funds required.</strong>
+                <strong className="text-foreground"> All transactions are on testnet - no real funds required.</strong>
               </AlertDescription>
             </Alert>
           )}
