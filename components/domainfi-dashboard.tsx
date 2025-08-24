@@ -48,15 +48,15 @@ export function DomanitorDashboard() {
   useEffect(() => {
     const loadMetrics = async () => {
       try {
-        console.log("[DomaAPI] Loading real-time metrics from Doma Protocol")
+        console.log("[DomaAPI] Loading enhanced simulation metrics from Doma Protocol")
 
-        // Load real-time dashboard statistics and market metrics
+        // Load enhanced dashboard statistics and market metrics
         const [dashboardStats, marketMetrics] = await Promise.all([
           DomaAPI.getDashboardStats(),
           DomaAPI.getMarketMetrics()
         ])
 
-        // Combine real-time data with existing metrics
+        // Combine enhanced simulation data with existing metrics
         const combinedMetrics = {
           ...marketMetrics,
           totalDomains: dashboardStats.totalDomains,
@@ -69,7 +69,7 @@ export function DomanitorDashboard() {
         }
 
         setMetrics(combinedMetrics)
-        console.log("[DomaAPI] Real-time metrics loaded successfully:", combinedMetrics)
+        console.log("[DomaAPI] Enhanced simulation metrics loaded successfully:", combinedMetrics)
       } catch (error) {
         console.error("[DomaAPI] Failed to load real-time Doma metrics:", error)
       }
