@@ -1,4 +1,4 @@
-// Doma Protocol Integration Layer with Official SDK
+// Doma Protocol Integration Layer with Official SDK and Updated APIs
 import { createDomaOrderbookClient, type DomaOrderbookClient } from '@doma-protocol/orderbook-sdk'
 
 export interface DomaConfig {
@@ -8,25 +8,79 @@ export interface DomaConfig {
   contractAddress: string
   chainId: number
   websocketUrl: string
+  graphqlUrl: string
+  pollApiUrl: string
+  smartContractsApiUrl: string
 }
 
 export const DOMA_CONFIG: DomaConfig = {
   testnetUrl: "https://start.doma.xyz",
   d3ApiUrl: "https://api-testnet.doma.xyz/v1",
   forgeApiUrl: "https://forge.doma.xyz/api",
-  contractAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e", // Doma Protocol testnet contract
+  contractAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e",
   chainId: 11155111, // Sepolia testnet
   websocketUrl: "wss://api-testnet.doma.xyz/ws",
+  graphqlUrl: "https://api-testnet.doma.xyz/graphql",
+  pollApiUrl: "https://api-testnet.doma.xyz/v1/poll",
+  smartContractsApiUrl: "https://api-testnet.doma.xyz/v1/smart-contracts"
 }
 
-// Real Doma Protocol API endpoints
+// Updated Doma Protocol API endpoints
 export const DOMA_ENDPOINTS = {
   subgraph: "https://api-testnet.doma.xyz/graphql",
   orderbook: "https://api-testnet.doma.xyz/v1/orderbook",
-  websocket: "wss://api-testnet.doma.xyz/ws"
+  websocket: "wss://api-testnet.doma.xyz/ws",
+  poll: "https://api-testnet.doma.xyz/v1/poll",
+  pollAck: "https://api-testnet.doma.xyz/v1/poll/ack",
+  smartContracts: "https://api-testnet.doma.xyz/v1/smart-contracts"
 }
 
-export const DOMA_API_KEY = "v1.d7c6c0712f209fb4c2352d8a4127181359a1324f5f1e8ba60eca3ab75b1d86f9"
+// Updated API Key
+export const DOMA_API_KEY = "v1.954d51b4e76bfda49d1ef7cd3869797b005f9a8558c2c6e4c8d2c642b24e80ca"
+
+// Poll API Event Types
+export type PollEventType = 
+  | "domain_registered"
+  | "domain_transferred" 
+  | "domain_expired"
+  | "domain_renewed"
+  | "domain_tokenized"
+  | "domain_bridged"
+  | "token_transferred"
+  | "marketplace_listing"
+  | "marketplace_sale"
+
+export interface PollEvent {
+  id: string
+  type: PollEventType
+  timestamp: string
+  blockNumber: number
+  transactionHash: string
+  data: {
+    domain?: string
+    tokenId?: string
+    from?: string
+    to?: string
+    price?: string
+    currency?: string
+    [key: string]: any
+  }
+}
+
+export interface PollResponse {
+  events: PollEvent[]
+  lastId?: string
+  hasMore: boolean
+}
+
+export interface SmartContractInfo {
+  address: string
+  name: string
+  network: string
+  abi: any[]
+  verified: boolean
+  implementation?: string
+}
 
 // Initialize Doma Orderbook Client
 let domaClient: DomaOrderbookClient | null = null
@@ -182,12 +236,145 @@ export interface DomaSubgraphData {
   }
 }
 
-// Enhanced API functions for Doma Protocol integration with official SDK
+// Enhanced API functions for Doma Protocol integration
 export class DomaAPI {
+  
+  // Poll API Implementation
+  static async pollEvents(
+    limit?: number,
+    eventTypes?: PollEventType[],
+    lastEventId?: string
+  ): Promise<PollResponse> {
+    try {
+      console.log('[DomaAPI] Polling for new events via Doma Poll API')
+      
+      const params = new URLSearchParams()
+      if (limit) params.append('limit', limit.toString())
+      if (eventTypes?.length) params.append('eventTypes', eventTypes.join(','))
+      if (lastEventId) params.append('lastEventId', lastEventId)
+      
+      const response = await fetch(`${DOMA_ENDPOINTS.poll}?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${DOMA_API_KEY}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Poll API request failed: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      return data
+      
+    } catch (error) {
+      console.warn('[DomaAPI] Poll API failed, using simulated events:', error)
+      
+      // Fallback to simulated events
+      return {
+        events: [
+          {
+            id: `evt_${Date.now()}`,
+            type: "domain_registered",
+            timestamp: new Date().toISOString(),
+            blockNumber: Math.floor(Math.random() * 1000000) + 19000000,
+            transactionHash: `0x${Math.random().toString(16).substr(2, 64)}`,
+            data: {
+              domain: "ethaga.ai",
+              tokenId: "1",
+              from: "0x0000000000000000000000000000000000000000",
+              to: "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e"
+            }
+          }
+        ],
+        lastId: `evt_${Date.now()}`,
+        hasMore: false
+      }
+    }
+  }
+  
+  // Poll Ack API Implementation
+  static async acknowledgePollEvents(lastEventId: string): Promise<{ success: boolean }> {
+    try {
+      console.log('[DomaAPI] Acknowledging poll events up to:', lastEventId)
+      
+      const response = await fetch(`${DOMA_ENDPOINTS.pollAck}/${lastEventId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${DOMA_API_KEY}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Poll Ack API request failed: ${response.status}`)
+      }
+      
+      return { success: true }
+      
+    } catch (error) {
+      console.warn('[DomaAPI] Poll Ack API failed:', error)
+      return { success: false }
+    }
+  }
+  
+  // Smart Contracts API Implementation
+  static async getSmartContractInfo(contractAddress: string): Promise<SmartContractInfo | null> {
+    try {
+      console.log('[DomaAPI] Fetching smart contract info for:', contractAddress)
+      
+      const response = await fetch(`${DOMA_ENDPOINTS.smartContracts}/${contractAddress}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${DOMA_API_KEY}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Smart Contracts API request failed: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      return data
+      
+    } catch (error) {
+      console.warn('[DomaAPI] Smart Contracts API failed:', error)
+      return null
+    }
+  }
+  
+  // Get all smart contracts
+  static async getAllSmartContracts(): Promise<SmartContractInfo[]> {
+    try {
+      console.log('[DomaAPI] Fetching all smart contracts')
+      
+      const response = await fetch(DOMA_ENDPOINTS.smartContracts, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${DOMA_API_KEY}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Smart Contracts API request failed: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      return data.contracts || []
+      
+    } catch (error) {
+      console.warn('[DomaAPI] Smart Contracts API failed:', error)
+      return []
+    }
+  }
+
   static async tokenizeDomain(
     request: TokenizationRequest,
   ): Promise<{ success: boolean; txHash?: string; tokenId?: string; error?: string }> {
-    console.log("[DomaAPI] Tokenizing domain via real Doma Protocol API:", request)
+    console.log("[DomaAPI] Tokenizing domain via updated Doma Protocol API:", request)
 
     try {
       // Step 1: Request tokenization voucher from Doma Protocol
@@ -195,7 +382,6 @@ export class DomaAPI {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": DOMA_API_KEY,
           "Authorization": `Bearer ${DOMA_API_KEY}`,
         },
         body: JSON.stringify({
@@ -218,14 +404,13 @@ export class DomaAPI {
       // Step 2: Monitor tokenization status
       const correlationId = voucherData.correlationId
       let attempts = 0
-      const maxAttempts = 20 // Wait up to 2 minutes
+      const maxAttempts = 20
 
       while (attempts < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, 6000)) // Wait 6 seconds
+        await new Promise((resolve) => setTimeout(resolve, 6000))
 
         const statusResponse = await fetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/status/${correlationId}`, {
           headers: {
-            "X-API-Key": DOMA_API_KEY,
             "Authorization": `Bearer ${DOMA_API_KEY}`,
           },
         })
@@ -243,7 +428,6 @@ export class DomaAPI {
             throw new Error(statusData.error || 'Tokenization failed')
           }
 
-          // Continue waiting if status is 'pending' or 'processing'
           console.log(`[DomaAPI] Tokenization status: ${statusData.status}`)
         }
 
@@ -262,7 +446,7 @@ export class DomaAPI {
       const tokenId = `doma_${Math.random().toString(36).substr(2, 9)}`
 
       return {
-        success: Math.random() > 0.2, // 80% success rate for simulation
+        success: Math.random() > 0.2,
         txHash: `0x${Math.random().toString(16).substr(2, 64)}`,
         tokenId: tokenId,
         error: error instanceof Error ? `API Error (using simulation): ${error.message}` : undefined
@@ -271,62 +455,107 @@ export class DomaAPI {
   }
 
   static async getDomainTokens(walletAddress: string): Promise<DomainToken[]> {
-    // Stable offline-first approach: Return enhanced simulation data immediately
-    console.log('[DomaAPI] Using enhanced user domain data (stable simulation mode) for:', walletAddress)
+    console.log('[DomaAPI] Fetching domain tokens from updated API for:', walletAddress)
 
-    // Enhanced simulation with realistic user domains
+    try {
+      // Try to use the updated subgraph endpoint
+      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DOMA_API_KEY}`,
+        },
+        body: JSON.stringify({
+          query: `
+            query GetDomainTokens($owner: String!) {
+              domains(where: { owner: $owner }) {
+                id
+                name
+                tokenId
+                owner
+                registrant
+                expirationDate
+                createdAt
+                registrar
+                isTokenized
+              }
+            }
+          `,
+          variables: { owner: walletAddress.toLowerCase() }
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.data?.domains) {
+          return data.data.domains.map((domain: any) => ({
+            id: domain.id,
+            name: domain.name,
+            owner: domain.owner,
+            tokenId: domain.tokenId,
+            registrar: domain.registrar,
+            expirationDate: domain.expirationDate,
+            isTokenized: domain.isTokenized,
+            fractionalized: false,
+            floorPrice: Math.random() * 2 + 0.1,
+            status: 'active' as const
+          }))
+        }
+      }
+    } catch (error) {
+      console.warn('[DomaAPI] Updated subgraph failed:', error)
+    }
+
+    // Fallback to enhanced simulation data
+    console.log('[DomaAPI] Using enhanced simulation data for wallet:', walletAddress)
+    
     const simulatedDomains: DomainToken[] = [
       {
         id: "doma_user_1",
-        name: "crypto.doma",
+        name: "ethaga.ai",
         owner: walletAddress,
         tokenId: "0x1a2b3c",
-        registrar: "Doma Protocol",
-        expirationDate: "2025-12-31T00:00:00Z",
+        registrar: "D3 Registrar",
+        expirationDate: "2027-07-04T00:00:00Z",
         isTokenized: true,
-        fractionalized: true,
-        totalShares: 1000,
-        availableShares: 750,
-        floorPrice: 1.8 + (Math.random() * 0.4 - 0.2),
-        lastSalePrice: 2.1,
+        fractionalized: false,
+        floorPrice: 0.5,
         status: "active",
       },
       {
         id: "doma_user_2",
-        name: "defi.doma",
+        name: "ethaga.io",
         owner: walletAddress,
         tokenId: "0x4d5e6f",
-        registrar: "Doma Protocol",
-        expirationDate: "2025-06-15T00:00:00Z",
+        registrar: "D3 Registrar",
+        expirationDate: "2026-07-04T00:00:00Z",
         isTokenized: true,
         fractionalized: false,
-        floorPrice: 850 + Math.floor(Math.random() * 100 - 50),
+        floorPrice: 0.3,
         status: "active",
       },
       {
         id: "doma_user_3",
-        name: "web3.doma",
+        name: "ethaga.com",
         owner: walletAddress,
         tokenId: "0x7g8h9i",
-        registrar: "Doma Protocol",
-        expirationDate: "2025-03-20T00:00:00Z",
+        registrar: "D3 Registrar",
+        expirationDate: "2026-07-04T00:00:00Z",
         isTokenized: true,
-        fractionalized: true,
-        totalShares: 500,
-        availableShares: 200,
-        floorPrice: 1200 + Math.floor(Math.random() * 200 - 100),
+        fractionalized: false,
+        floorPrice: 0.8,
         status: "active",
       },
       {
         id: "doma_user_4",
-        name: "nft.doma",
+        name: "ethaga.ape",
         owner: walletAddress,
         tokenId: "0x9j0k1l",
-        registrar: "Doma Protocol",
-        expirationDate: "2025-08-10T00:00:00Z",
+        registrar: "D3 Registrar",
+        expirationDate: "2026-07-04T00:00:00Z",
         isTokenized: true,
         fractionalized: false,
-        floorPrice: 650 + Math.floor(Math.random() * 150 - 75),
+        floorPrice: 0.2,
         status: "active",
       }
     ]
@@ -334,7 +563,148 @@ export class DomaAPI {
     return simulatedDomains
   }
 
+  // Enhanced subgraph data with updated endpoint
+  static async getSubgraphData(): Promise<DomaSubgraphData> {
+    try {
+      console.log('[DomaAPI] Fetching from updated subgraph endpoint')
+      
+      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DOMA_API_KEY}`,
+        },
+        body: JSON.stringify({
+          query: `
+            query GetMarketData {
+              domains(first: 100) {
+                id
+                name
+                tokenId
+                owner
+                registrant
+                expirationDate
+                createdAt
+                registrar
+                isTokenized
+              }
+              transactions: tokenTransfers(first: 20, orderBy: timestamp, orderDirection: desc) {
+                id
+                type: __typename
+                from
+                to
+                tokenId
+                timestamp
+                transactionHash
+              }
+              marketMetrics: _meta {
+                block {
+                  number
+                  timestamp
+                }
+              }
+            }
+          `
+        })
+      })
 
+      if (response.ok) {
+        const data = await response.json()
+        return {
+          domains: data.data.domains || [],
+          transactions: data.data.transactions || [],
+          marketMetrics: {
+            totalDomains: data.data.domains?.length || 0,
+            totalVolume: "2850000",
+            floorPrice: "0.05",
+            averagePrice: "1.8"
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('[DomaAPI] Updated subgraph failed, using simulation:', error)
+    }
+
+    // Enhanced simulation data
+    const baseTime = Date.now()
+    return {
+      domains: [
+        {
+          id: 'doma_domain_1',
+          name: 'ethaga.ai',
+          tokenId: '0x1a2b3c',
+          owner: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+          registrant: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+          expirationDate: '2027-07-04T00:00:00Z',
+          createdAt: '2024-01-15T10:30:00Z',
+          registrar: 'D3 Registrar',
+          isTokenized: true
+        }
+      ],
+      transactions: [
+        {
+          id: 'doma_tx_1',
+          type: 'mint',
+          from: '0x0000000000000000000000000000000000000000',
+          to: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+          tokenId: '0x1a2b3c',
+          timestamp: new Date(baseTime - 1800000).toISOString(),
+          transactionHash: '0xa1b2c3d4e5f6789a'
+        }
+      ],
+      marketMetrics: {
+        totalDomains: 1247,
+        totalVolume: "2850000",
+        floorPrice: "0.05",
+        averagePrice: "1.8"
+      }
+    }
+  }
+
+  // Enhanced real-time polling for events
+  static async startEventPolling(
+    callback: (events: PollEvent[]) => void,
+    intervalMs: number = 30000
+  ): Promise<() => void> {
+    console.log('[DomaAPI] Starting enhanced event polling with Poll API')
+    
+    let lastEventId: string | undefined = undefined
+    let polling = true
+    
+    const poll = async () => {
+      if (!polling) return
+      
+      try {
+        const response = await this.pollEvents(50, undefined, lastEventId)
+        
+        if (response.events.length > 0) {
+          callback(response.events)
+          
+          // Acknowledge the events
+          if (response.lastId) {
+            await this.acknowledgePollEvents(response.lastId)
+            lastEventId = response.lastId
+          }
+        }
+      } catch (error) {
+        console.warn('[DomaAPI] Event polling error:', error)
+      }
+      
+      if (polling) {
+        setTimeout(poll, intervalMs)
+      }
+    }
+    
+    // Start polling
+    poll()
+    
+    // Return cleanup function
+    return () => {
+      polling = false
+    }
+  }
+
+  // Existing methods with updated configurations...
   static async createAlert(subscription: Omit<AlertSubscription, "id">): Promise<AlertSubscription> {
     return {
       id: Math.random().toString(36).substr(2, 9),
@@ -342,103 +712,7 @@ export class DomaAPI {
     }
   }
 
-  static async createBot(config: Omit<BotConfiguration, "id" | "metrics">): Promise<BotConfiguration> {
-    console.log("[v0] Creating new bot via Doma Protocol:", config)
-
-    const botId = `bot_${Math.random().toString(36).substr(2, 9)}`
-
-    return {
-      id: botId,
-      ...config,
-      metrics: {
-        alertsSent: 0,
-        transactionsGenerated: 0,
-        revenueGenerated: 0,
-        userAcquisition: 0,
-        communityEngagement: 0,
-        successRate: 0,
-      },
-    }
-  }
-
-  static async getBotMetrics(botId: string): Promise<BotMetrics> {
-    // Simulate real-time metrics from Doma Protocol
-    return {
-      alertsSent: Math.floor(Math.random() * 1000) + 500,
-      transactionsGenerated: Math.floor(Math.random() * 200) + 50,
-      revenueGenerated: Math.floor(Math.random() * 5000) + 1000,
-      userAcquisition: Math.floor(Math.random() * 50) + 10,
-      communityEngagement: Math.floor(Math.random() * 100) + 50,
-      successRate: Math.floor(Math.random() * 30) + 70,
-    }
-  }
-
-  static async deployTelegramBot(
-    config: BotConfiguration,
-  ): Promise<{ success: boolean; botToken?: string; webhookUrl?: string }> {
-    console.log("[v0] Deploying Telegram bot with Doma integration:", config.name)
-
-    // Simulate bot deployment to Telegram
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    return {
-      success: true,
-      botToken: `bot_${Math.random().toString(36).substr(2, 20)}`,
-      webhookUrl: `https://api.doma.xyz/webhook/${config.id}`,
-    }
-  }
-
-  static async deployTwitterBot(config: BotConfiguration): Promise<{ success: boolean; accountHandle?: string }> {
-    console.log("[v0] Deploying Twitter bot with Doma integration:", config.name)
-
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    return {
-      success: true,
-      accountHandle: `@DomainBot_${config.id.substr(0, 6)}`,
-    }
-  }
-
-  static async getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
-    return [
-      {
-        tier: "free",
-        price: 0,
-        features: ["10 domains", "Basic alerts", "Email notifications"],
-        limits: { domains: 10, bots: 1, alerts: 100 },
-      },
-      {
-        tier: "pro",
-        price: 29,
-        features: ["Unlimited domains", "All bot types", "Custom filters", "Auto-transactions"],
-        limits: { domains: -1, bots: 5, alerts: 1000 },
-      },
-      {
-        tier: "enterprise",
-        price: 199,
-        features: ["White-label bots", "API access", "Custom integrations", "Priority support"],
-        limits: { domains: -1, bots: -1, alerts: -1 },
-      },
-    ]
-  }
-
-  static async subscribeToTier(
-    walletAddress: string,
-    tier: string,
-  ): Promise<{ success: boolean; subscriptionId?: string }> {
-    console.log("[v0] Processing subscription to", tier, "tier for", walletAddress)
-
-    // Simulate payment processing and subscription activation
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    return {
-      success: true,
-      subscriptionId: `sub_${Math.random().toString(36).substr(2, 12)}`,
-    }
-  }
-
   static async getMarketMetrics() {
-    // Try to get real data from Doma subgraph first
     try {
       const subgraphData = await this.getSubgraphData()
       return {
@@ -449,7 +723,6 @@ export class DomaAPI {
         transactions24h: subgraphData.transactions.length,
         uniqueUsers24h: new Set(subgraphData.transactions.map(tx => tx.from)).size,
         avgTransactionValue: parseFloat(subgraphData.marketMetrics.averagePrice) || 2150,
-        // Bot-specific metrics for Track 3
         activeBots: 89,
         botSubscribers: 1247,
         botRevenue: 12800,
@@ -457,8 +730,7 @@ export class DomaAPI {
         userAcquisitionRate: 23,
       }
     } catch (error) {
-      console.warn('[DomaAPI] Failed to fetch real market metrics, using fallback data:', error)
-      // Fallback to mock data
+      console.warn('[DomaAPI] Failed to fetch market metrics:', error)
       return {
         totalDomains: 2847,
         tokenizedValue: 4200000,
@@ -473,504 +745,6 @@ export class DomaAPI {
         communityEngagement: 78,
         userAcquisitionRate: 23,
       }
-    }
-  }
-
-  static async subscribeToAlerts(walletAddress: string, callback: (alert: any) => void): Promise<WebSocket> {
-    try {
-      console.log('[DomaAPI] Attempting to connect to real Doma Protocol WebSocket for wallet:', walletAddress)
-
-      // Try to connect to real Doma Protocol WebSocket
-      const wsUrl = `${DOMA_ENDPOINTS.websocket}?wallet=${walletAddress}&apiKey=${DOMA_API_KEY}`
-      const realWs = new WebSocket(wsUrl)
-
-      realWs.onopen = () => {
-        console.log("[DomaAPI] Connected to real Doma Protocol WebSocket")
-
-        // Subscribe to relevant events
-        realWs.send(JSON.stringify({
-          type: 'subscribe',
-          events: ['domain_expiration', 'domain_transfer', 'domain_sale', 'price_change'],
-          wallet: walletAddress
-        }))
-      }
-
-      realWs.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data)
-
-          // Transform real WebSocket data to our alert format
-          const alert = {
-            type: data.event_type || data.type,
-            domain: data.domain_name || data.domain,
-            message: data.message || `${data.event_type} event for ${data.domain_name}`,
-            severity: data.severity || this.determineSeverity(data.event_type),
-            timestamp: data.timestamp || new Date().toISOString(),
-            metadata: {
-              ...data,
-              realTime: true
-            }
-          }
-
-          callback(alert)
-        } catch (error) {
-          console.warn('[DomaAPI] Failed to parse WebSocket message:', error)
-        }
-      }
-
-      realWs.onerror = (error) => {
-        console.error('[DomaAPI] WebSocket error:', error)
-      }
-
-      realWs.onclose = (event) => {
-        console.log('[DomaAPI] WebSocket closed:', event.code, event.reason)
-      }
-
-      // Wait a moment to see if connection succeeds
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      if (realWs.readyState === WebSocket.OPEN) {
-        return realWs
-      } else {
-        throw new Error('WebSocket connection failed')
-      }
-
-    } catch (error) {
-      console.warn('[DomaAPI] Real WebSocket failed, using enhanced simulation:', error)
-
-      // Enhanced fallback WebSocket simulation with more realistic data
-      const mockWs = {
-        readyState: 1, // OPEN
-        close: () => {
-          console.log('[DomaAPI] Mock WebSocket closed')
-          clearInterval(alertInterval)
-        },
-        onopen: null as ((event: Event) => void) | null,
-        onmessage: null as ((event: MessageEvent) => void) | null,
-        onerror: null as ((event: Event) => void) | null,
-        onclose: null as ((event: CloseEvent) => void) | null,
-        send: (data: string) => {
-          console.log('[DomaAPI] Mock WebSocket received:', data)
-        }
-      } as WebSocket
-
-      // Simulate connection opening
-      setTimeout(() => {
-        console.log("[DomaAPI] Connected to Doma real-time alerts (simulation)")
-        if (mockWs.onopen) {
-          mockWs.onopen(new Event('open'))
-        }
-      }, 100)
-
-      // Enhanced simulation with more realistic domain activity
-      const alertInterval = setInterval(() => {
-        const alertTypes = [
-          { type: 'expiration', domains: ['crypto.doma', 'defi.doma', 'web3.doma'], severity: 'medium' },
-          { type: 'transfer', domains: ['nft.doma', 'dao.doma', 'metaverse.doma'], severity: 'high' },
-          { type: 'sale', domains: ['premium.doma', 'blockchain.doma', 'ai.doma'], severity: 'low' },
-          { type: 'price_change', domains: ['crypto.doma', 'defi.doma'], severity: 'low' }
-        ]
-
-        const selectedAlert = alertTypes[Math.floor(Math.random() * alertTypes.length)]
-        const selectedDomain = selectedAlert.domains[Math.floor(Math.random() * selectedAlert.domains.length)]
-
-        const mockAlert = {
-          type: selectedAlert.type,
-          domain: selectedDomain,
-          message: this.generateRealisticMessage(selectedAlert.type, selectedDomain),
-          severity: selectedAlert.severity,
-          timestamp: new Date().toISOString(),
-          metadata: {
-            simulation: true,
-            price: selectedAlert.type === 'price_change' ? Math.random() * 10 + 0.1 : undefined,
-            expirationDays: selectedAlert.type === 'expiration' ? Math.floor(Math.random() * 30) + 1 : undefined
-          }
-        }
-
-        callback(mockAlert)
-      }, 45000) // Send enhanced alerts every 45 seconds
-
-      return mockWs
-    }
-  }
-
-  // Helper method to determine alert severity
-  private static determineSeverity(eventType: string): string {
-    switch (eventType) {
-      case 'domain_expiration':
-        return 'medium'
-      case 'domain_transfer':
-        return 'high'
-      case 'domain_sale':
-        return 'low'
-      case 'price_change':
-        return 'low'
-      default:
-        return 'medium'
-    }
-  }
-
-  // Helper method to generate realistic alert messages
-  private static generateRealisticMessage(type: string, domain: string): string {
-    switch (type) {
-      case 'expiration':
-        const days = Math.floor(Math.random() * 30) + 1
-        return `Domain ${domain} expires in ${days} days`
-      case 'transfer':
-        return `Domain ${domain} ownership has been transferred`
-      case 'sale':
-        const price = (Math.random() * 10 + 0.1).toFixed(2)
-        return `Domain ${domain} sold for ${price} ETH`
-      case 'price_change':
-        const change = Math.floor(Math.random() * 50) + 5
-        return `Domain ${domain} price increased by ${change}%`
-      default:
-        return `Activity detected for domain ${domain}`
-    }
-  }
-
-  static async fractionalizeDomain(
-    tokenId: string,
-    totalShares: number,
-  ): Promise<{ success: boolean; contractAddress?: string }> {
-    console.log("[v0] Fractionalizing domain:", tokenId, "into", totalShares, "shares")
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    return {
-      success: true,
-      contractAddress: `0x${Math.random().toString(16).substr(2, 40)}`,
-    }
-  }
-
-  // Enhanced Doma Protocol Subgraph Data (Stable Simulation Mode)
-  static async getSubgraphData(): Promise<DomaSubgraphData> {
-    // Stable offline-first approach: Return enhanced simulation data immediately
-    console.log('[DomaAPI] Using enhanced subgraph data (stable simulation mode)')
-
-    // Enhanced simulation with realistic, dynamic data
-    const baseTime = Date.now()
-    const simulatedData: DomaSubgraphData = {
-      domains: [
-        {
-          id: 'doma_domain_1',
-          name: 'crypto.doma',
-          tokenId: '0x1a2b3c',
-          owner: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          registrant: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          expirationDate: '2025-12-31T00:00:00Z',
-          createdAt: '2024-01-15T10:30:00Z',
-          registrar: 'Doma Protocol',
-          isTokenized: true
-        },
-        {
-          id: 'doma_domain_2',
-          name: 'defi.doma',
-          tokenId: '0x4d5e6f',
-          owner: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          registrant: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          expirationDate: '2025-06-15T00:00:00Z',
-          createdAt: '2024-02-20T14:45:00Z',
-          registrar: 'Doma Protocol',
-          isTokenized: true
-        },
-        {
-          id: 'doma_domain_3',
-          name: 'web3.doma',
-          tokenId: '0x7g8h9i',
-          owner: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          registrant: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          expirationDate: '2025-03-20T00:00:00Z',
-          createdAt: '2024-03-10T09:15:00Z',
-          registrar: 'Doma Protocol',
-          isTokenized: true
-        }
-      ],
-      transactions: [
-        {
-          id: 'doma_tx_1',
-          type: 'mint',
-          from: '0x0000000000000000000000000000000000000000',
-          to: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          tokenId: '0x1a2b3c',
-          timestamp: new Date(baseTime - 1800000).toISOString(),
-          transactionHash: '0xa1b2c3d4e5f6789a'
-        },
-        {
-          id: 'doma_tx_2',
-          type: 'transfer',
-          from: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          to: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          tokenId: '0x4d5e6f',
-          timestamp: new Date(baseTime - 3600000).toISOString(),
-          transactionHash: '0xf6e5d4c3b2a1987b'
-        },
-        {
-          id: 'doma_tx_3',
-          type: 'mint',
-          from: '0x0000000000000000000000000000000000000000',
-          to: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-          tokenId: '0x7g8h9i',
-          timestamp: new Date(baseTime - 5400000).toISOString(),
-          transactionHash: '0x9i8h7g6f5e4d321c'
-        }
-      ],
-      marketMetrics: {
-        totalDomains: 1247 + Math.floor(Math.random() * 10),
-        totalVolume: (2850000 + Math.random() * 100000).toString(),
-        floorPrice: (0.05 + Math.random() * 0.02).toFixed(3),
-        averagePrice: (1.8 + Math.random() * 0.4).toFixed(2)
-      }
-    }
-
-    return simulatedData
-  }
-
-
-  static async createDomainListing(
-    domain: string,
-    price: number,
-    currency: string,
-    walletAddress: string
-  ): Promise<{ success: boolean; listingId?: string; error?: string }> {
-    try {
-      const client = initializeDomaClient()
-      if (!client) {
-        throw new Error('Doma client not available')
-      }
-
-      // Using the Doma SDK to create a listing
-      console.log('[DomaAPI] Creating domain listing via Doma SDK:', { domain, price, currency })
-
-      // Simulate successful listing creation
-      const listingId = `listing_${Math.random().toString(36).substr(2, 9)}`
-
-      return {
-        success: true,
-        listingId
-      }
-    } catch (error) {
-      console.error('[DomaAPI] Failed to create listing:', error)
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }
-    }
-  }
-
-  static async getDomainListings(): Promise<DomainListing[]> {
-    // Stable offline-first approach: Return enhanced simulation data immediately
-    console.log('[DomaAPI] Using enhanced marketplace listings (stable simulation mode)')
-
-    const baseTime = Date.now()
-
-    // Enhanced simulation with dynamic marketplace listings
-    const marketplaceListings: DomainListing[] = [
-      {
-        id: 'doma_listing_1',
-        domain: 'crypto.doma',
-        price: 2.5 + (Math.random() * 0.5 - 0.25),
-        currency: 'ETH',
-        seller: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-        status: 'active',
-        listedAt: new Date(baseTime - 43200000).toISOString(),
-        tokenId: '0x1a2b3c',
-        chainId: 11155111
-      },
-      {
-        id: 'doma_listing_2',
-        domain: 'defi.doma',
-        price: 1500 + Math.floor(Math.random() * 200 - 100),
-        currency: 'USDC',
-        seller: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-        status: 'active',
-        listedAt: new Date(baseTime - 86400000).toISOString(),
-        tokenId: '0x4d5e6f',
-        chainId: 11155111
-      },
-      {
-        id: 'doma_listing_3',
-        domain: 'web3.doma',
-        price: 0.8 + (Math.random() * 0.2 - 0.1),
-        currency: 'ETH',
-        seller: '0x456d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-        status: 'active',
-        listedAt: new Date(baseTime - 129600000).toISOString(),
-        tokenId: '0x7g8h9i',
-        chainId: 11155111
-      },
-      {
-        id: 'doma_listing_4',
-        domain: 'nft.doma',
-        price: 1.2 + (Math.random() * 0.3 - 0.15),
-        currency: 'ETH',
-        seller: '0x789d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-        status: 'active',
-        listedAt: new Date(baseTime - 172800000).toISOString(),
-        tokenId: '0x9j0k1l',
-        chainId: 11155111
-      },
-      {
-        id: 'doma_listing_5',
-        domain: 'dao.doma',
-        price: 850 + Math.floor(Math.random() * 150 - 75),
-        currency: 'USDC',
-        seller: '0xabcd35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
-        status: 'active',
-        listedAt: new Date(baseTime - 216000000).toISOString(),
-        tokenId: '0x2m3n4o',
-        chainId: 11155111
-      }
-    ]
-
-    return marketplaceListings
-  }
-
-
-  static async createDomainOffer(
-    domain: string,
-    price: number,
-    currency: string,
-    walletAddress: string
-  ): Promise<{ success: boolean; offerId?: string; error?: string }> {
-    try {
-      const client = initializeDomaClient()
-      if (!client) {
-        throw new Error('Doma client not available')
-      }
-
-      console.log('[DomaAPI] Creating domain offer via Doma SDK:', { domain, price, currency })
-
-      const offerId = `offer_${Math.random().toString(36).substr(2, 9)}`
-
-      return {
-        success: true,
-        offerId
-      }
-    } catch (error) {
-      console.error('[DomaAPI] Failed to create offer:', error)
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }
-    }
-  }
-
-  static async bridgeDomain(
-    tokenId: string,
-    targetChain: string,
-    targetAddress: string
-  ): Promise<{ success: boolean; bridgeTxHash?: string; error?: string }> {
-    try {
-      console.log('[DomaAPI] Bridging domain via Doma Protocol:', { tokenId, targetChain, targetAddress })
-
-      // Simulate bridge transaction
-      await new Promise(resolve => setTimeout(resolve, 3000))
-
-      return {
-        success: Math.random() > 0.1, // 90% success rate
-        bridgeTxHash: `0x${Math.random().toString(16).substr(2, 64)}`
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Bridge failed'
-      }
-    }
-  }
-
-  static async getDomaAnalytics(timeframe: '24h' | '7d' | '30d' = '24h') {
-    try {
-      const subgraphData = await this.getSubgraphData()
-
-      return {
-        volume: parseFloat(subgraphData.marketMetrics.totalVolume),
-        transactions: subgraphData.transactions.length,
-        uniqueUsers: new Set(subgraphData.transactions.map(tx => tx.from)).size,
-        averagePrice: parseFloat(subgraphData.marketMetrics.averagePrice),
-        floorPrice: parseFloat(subgraphData.marketMetrics.floorPrice),
-        topDomains: subgraphData.domains.slice(0, 10).map(domain => ({
-          name: domain.name,
-          tokenId: domain.tokenId,
-          owner: domain.owner,
-          registrar: domain.registrar
-        })),
-        recentTransactions: subgraphData.transactions.slice(0, 10)
-      }
-    } catch (error) {
-      console.error('[DomaAPI] Failed to fetch analytics:', error)
-      return {
-        volume: 4200000,
-        transactions: 234,
-        uniqueUsers: 127,
-        averagePrice: 2.5,
-        floorPrice: 0.1,
-        topDomains: [],
-        recentTransactions: []
-      }
-    }
-  }
-
-  // Enhanced domain monitoring (Stable Simulation Mode)
-  static async setupDomainMonitoring(
-    domains: string[],
-    webhookUrl: string
-  ): Promise<{ success: boolean; monitoringId?: string; error?: string }> {
-    console.log('[DomaAPI] Setting up domain monitoring (stable simulation mode):', { domains, webhookUrl })
-
-    // Enhanced simulation for monitoring setup
-    const monitoringId = `monitor_${Math.random().toString(36).substr(2, 9)}`
-
-    return {
-      success: true,
-      monitoringId,
-      error: undefined
-    }
-  }
-
-  // Get real-time dashboard statistics (Enhanced Simulation Mode)
-  static async getDashboardStats(): Promise<{
-    totalDomains: number
-    activeListings: number
-    totalVolume: string
-    recentActivity: number
-    priceChange24h: number
-    newRegistrations24h: number
-  }> {
-    // Stable offline-first approach: Return enhanced simulation data immediately
-    console.log('[DomaAPI] Using enhanced dashboard statistics (stable simulation mode)')
-
-    // Enhanced simulation with realistic, dynamic data
-    const randomVariation = () => Math.floor(Math.random() * 10) - 5
-    const simulatedStats = {
-      totalDomains: 1247 + randomVariation(),
-      activeListings: 89 + Math.floor(randomVariation() / 2),
-      totalVolume: (2850000 + randomVariation() * 10000).toString(),
-      recentActivity: 156 + randomVariation(),
-      priceChange24h: 5.2 + (Math.random() * 4 - 2),
-      newRegistrations24h: 23 + Math.floor(randomVariation() / 3)
-    }
-
-    return simulatedStats
-  }
-
-
-  // Get live network status (Enhanced Simulation Mode)
-  static async getNetworkStatus(): Promise<{
-    chainId: number
-    blockNumber: number
-    gasPrice: string
-    isConnected: boolean
-    lastUpdate: string
-  }> {
-    console.log('[DomaAPI] Using enhanced network status (stable simulation mode)')
-
-    // Enhanced simulation for network status
-    return {
-      chainId: DOMA_CONFIG.chainId,
-      blockNumber: Math.floor(Math.random() * 1000000) + 19000000,
-      gasPrice: (Math.random() * 50 + 10).toFixed(0),
-      isConnected: true,
-      lastUpdate: new Date().toISOString()
     }
   }
 }
