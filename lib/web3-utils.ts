@@ -176,28 +176,136 @@ export class DomaWeb3Service {
   }
 
   async isConnectedToDomaTestnet(): Promise<boolean> {
-    try {
-      const chainId = await this.web3.eth.getChainId()
-      return chainId === 11155111 // Sepolia testnet
-    } catch (error) {
-      console.error('[DomaWeb3] Error checking chain:', error)
-      return false
-    }
+    return await this.domaSmartContracts.isConnectedToDomaTestnet()
   }
 
   async switchToDomaTestnet(): Promise<boolean> {
+    return await this.domaSmartContracts.switchToDomaTestnet()
+  }
+
+  // Doma Smart Contracts Operations
+
+  async requestTokenization(
+    domains: string[],
+    walletAddress: string
+  ): Promise<{ success: boolean; transactionHash?: string; error?: string }> {
     try {
-      if (typeof window !== 'undefined' && window.ethereum) {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: DOMA_TESTNET_CONFIG.chainId }],
-        })
-        return true
+      // Create tokenization voucher
+      const names = domains.map(domain => {
+        const [sld, tld] = domain.split('.')
+        return {
+          sld,
+          tld,
+          registrarIanaId: 1 // Default registrar
+        }
+      })
+
+      const voucher = DomaVoucherUtils.createTokenizationVoucher(names, walletAddress)
+
+      // In production, this signature would come from the registrar
+      const signature = "0x" + "0".repeat(130) // Placeholder signature
+
+      const result = await this.domaSmartContracts.requestTokenization(
+        voucher,
+        signature,
+        walletAddress
+      )
+
+      return {
+        success: result.success,
+        transactionHash: result.transactionHash,
+        error: result.error
       }
-      return false
     } catch (error) {
-      console.error('[DomaWeb3] Error switching network:', error)
-      return false
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Tokenization request failed'
+      }
+    }
+  }
+
+  async claimDomainOwnership(
+    tokenId: number,
+    walletAddress: string
+  ): Promise<{ success: boolean; transactionHash?: string; error?: string }> {
+    try {
+      const proofOfContactsVoucher = DomaVoucherUtils.createProofOfContactsVoucher(
+        Date.now() // registrant handle
+      )
+
+      // In production, this signature would come from the proof storage
+      const signature = "0x" + "0".repeat(130) // Placeholder signature
+
+      const result = await this.domaSmartContracts.claimOwnership(
+        tokenId,
+        false, // isSynthetic
+        proofOfContactsVoucher,
+        signature,
+        walletAddress
+      )
+
+      return {
+        success: result.success,
+        transactionHash: result.transactionHash,
+        error: result.error
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Claim ownership failed'
+      }
+    }
+  }
+
+  async bridgeDomain(
+    tokenId: number,
+    targetChainId: string,
+    targetOwnerAddress: string,
+    walletAddress: string
+  ): Promise<{ success: boolean; transactionHash?: string; error?: string }> {
+    try {
+      const result = await this.domaSmartContracts.bridge(
+        tokenId,
+        false, // isSynthetic
+        targetChainId,
+        targetOwnerAddress,
+        walletAddress
+      )
+
+      return {
+        success: result.success,
+        transactionHash: result.transactionHash,
+        error: result.error
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Bridge failed'
+      }
+    }
+  }
+
+  async requestDetokenization(
+    tokenId: number,
+    walletAddress: string
+  ): Promise<{ success: boolean; transactionHash?: string; error?: string }> {
+    try {
+      const result = await this.domaSmartContracts.requestDetokenization(
+        tokenId,
+        false, // isSynthetic
+        walletAddress
+      )
+
+      return {
+        success: result.success,
+        transactionHash: result.transactionHash,
+        error: result.error
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Detokenization failed'
+      }
     }
   }
 
