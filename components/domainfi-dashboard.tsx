@@ -164,20 +164,6 @@ export function DomanitorDashboard() {
                   </Button>
                 </div>
 
-                {/* Separator */}
-                <div className="h-6 w-px bg-border" />
-
-                {/* Responsive Demo Link */}
-                <Button variant="ghost" size="sm" asChild>
-                  <a
-                    href="/responsive-demo"
-                    className="flex items-center gap-1"
-                  >
-                    <Activity className="h-3 w-3" />
-                    Responsive Demo
-                  </a>
-                </Button>
-
                 {/* Doma Protocol Link */}
                 <Button variant="ghost" size="sm" asChild>
                   <a
@@ -335,7 +321,7 @@ export function DomanitorDashboard() {
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Enterprise Tools → Click for management demo</p>
+                        <p>Enterprise Tools �� Click for management demo</p>
                       </TooltipContent>
                     </Tooltip>
 
