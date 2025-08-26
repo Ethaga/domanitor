@@ -263,14 +263,14 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-12">
+                      <TableCell colSpan={6} className="text-center py-12">
                         <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
                         <p className="text-muted-foreground">Loading domains...</p>
                       </TableCell>
                     </TableRow>
                   ) : filteredDomains.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                      <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                         {searchTerm ? "No domains found matching your search." : "No domains found. Start by tokenizing your first domain!"}
                       </TableCell>
                     </TableRow>
