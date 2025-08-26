@@ -114,14 +114,9 @@ export const ERC20_ABI = [
   }
 ] as const
 
-export interface DomainAsset {
-  tokenId: string
-  name: string
-  expirationDate: string
-  registrar: string
-  isActive: boolean
-  tokenizedValue: string
-  owner: string
+// Enhanced domain asset using Doma Smart Contracts
+export interface DomainAsset extends DomaDomainAsset {
+  // Additional legacy fields for backward compatibility
 }
 
 export interface DIDAsset {
