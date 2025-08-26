@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 
-// Doma Protocol smart contract addresses on Sepolia testnet
+// Doma Protocol smart contract addresses on Sepolia testnet (Updated)
 export const DOMA_CONTRACTS = {
   DOMA_DOMAIN_REGISTRY: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
   DOMA_DID_REGISTRY: '0x123d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
