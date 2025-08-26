@@ -333,12 +333,22 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" className="text-blue-600 border-blue-600 hover:bg-blue-50">
-                              Claimed
-                            </Button>
-                            <Button variant="outline" size="sm" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                          <div className="flex items-center gap-1 lg:gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-blue-600 border-blue-600 hover:bg-blue-50 text-xs lg:text-sm"
+                              disabled={domain.isTransferLocked}
+                              title={domain.isTransferLocked ? "Domain is transfer locked" : "Bridge to another chain"}
+                            >
                               Bridge
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-green-600 border-green-600 hover:bg-green-50 text-xs lg:text-sm"
+                            >
+                              Claim
                             </Button>
                             <Button variant="ghost" size="sm" asChild>
                               <a
@@ -346,8 +356,9 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-muted-foreground hover:text-foreground"
+                                title="View on Etherscan"
                               >
-                                <ExternalLink className="h-4 w-4" />
+                                <ExternalLink className="h-3 w-3 lg:h-4 lg:w-4" />
                               </a>
                             </Button>
                           </div>
