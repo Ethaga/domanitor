@@ -153,6 +153,7 @@ export interface WalletAssets {
 
 export class DomaWeb3Service {
   private web3: Web3
+  private domaSmartContracts: DomaSmartContractsService
   private domainContract: any
   private didContract: any
   private tokenContract: any
@@ -165,6 +166,10 @@ export class DomaWeb3Service {
       this.web3 = new Web3('https://sepolia.infura.io/v3/your-project-id')
     }
 
+    // Initialize Doma Smart Contracts service
+    this.domaSmartContracts = createDomaSmartContractsService(provider)
+
+    // Legacy contracts for backward compatibility
     this.domainContract = new this.web3.eth.Contract(DOMAIN_TOKEN_ABI, DOMA_CONTRACTS.DOMA_DOMAIN_REGISTRY)
     this.didContract = new this.web3.eth.Contract(DID_REGISTRY_ABI, DOMA_CONTRACTS.DOMA_DID_REGISTRY)
     this.tokenContract = new this.web3.eth.Contract(ERC20_ABI, DOMA_CONTRACTS.DOMA_TOKEN)
