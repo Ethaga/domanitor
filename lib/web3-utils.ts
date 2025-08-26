@@ -18,18 +18,8 @@ export const DOMA_CONTRACTS = {
   DOMA_MARKETPLACE: '0x789d35Cc6634C0532925a3b8D4C9db96C4b5Da5e'
 }
 
-// Doma testnet chain configuration
-export const DOMA_TESTNET_CONFIG = {
-  chainId: '0xaa36a7', // Sepolia testnet (11155111)
-  chainName: 'Doma Testnet (Sepolia)',
-  nativeCurrency: {
-    name: 'Ethereum',
-    symbol: 'ETH',
-    decimals: 18
-  },
-  rpcUrls: ['https://sepolia.infura.io/v3/'],
-  blockExplorerUrls: ['https://sepolia.etherscan.io']
-}
+// Use Doma chain configuration from smart contracts module
+export const DOMA_TESTNET_CONFIG = DOMA_CHAIN_CONFIG
 
 // ERC-721 ABI for domain tokens
 export const DOMAIN_TOKEN_ABI = [
