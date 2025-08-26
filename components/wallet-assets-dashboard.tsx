@@ -316,51 +316,56 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
 
           {/* Detailed Assets Tabs */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
               <div>
                 <CardTitle>Aset Wallet Detail</CardTitle>
                 <CardDescription>
                   Daftar lengkap semua aset pada Doma testnet
                 </CardDescription>
               </div>
-              <Button onClick={loadAssets} disabled={loading} size="sm">
+              <Button onClick={loadAssets} disabled={loading} size="sm" className="self-start md:self-auto">
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                Refresh
+                <span className="hidden sm:inline">Refresh</span>
+                <span className="sm:hidden">⟳</span>
               </Button>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="domains" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="domains" className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    Domain ({assets.domains.length})
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+                  <TabsTrigger value="domains" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+                    <Globe className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline">Domain</span>
+                    <span className="sm:hidden">Dom</span>
+                    <span>({assets.domains.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="dids" className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    DID ({assets.dids.length})
+                  <TabsTrigger value="dids" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+                    <Shield className="h-3 w-3 md:h-4 md:w-4" />
+                    <span>DID ({assets.dids.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="tokens" className="flex items-center gap-2">
-                    <Coins className="h-4 w-4" />
-                    Token ({assets.tokens.length})
+                  <TabsTrigger value="tokens" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+                    <Coins className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline">Token</span>
+                    <span className="sm:hidden">Tok</span>
+                    <span>({assets.tokens.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="nfts" className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4" />
-                    NFT ({assets.nfts.length})
+                  <TabsTrigger value="nfts" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+                    <TrendingUp className="h-3 w-3 md:h-4 md:w-4" />
+                    <span>NFT ({assets.nfts.length})</span>
                   </TabsTrigger>
                 </TabsList>
 
                 {/* Domains Tab */}
                 <TabsContent value="domains" className="space-y-4">
-                  <div className="rounded-md border">
+                  <div className="rounded-md border overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Nama Domain</TableHead>
-                          <TableHead>Nilai Tokenized</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Registrar</TableHead>
-                          <TableHead>Tanggal Kadaluarsa</TableHead>
-                          <TableHead>Action</TableHead>
+                          <TableHead className="min-w-[150px]">Nama Domain</TableHead>
+                          <TableHead className="min-w-[120px]">Nilai Tokenized</TableHead>
+                          <TableHead className="min-w-[100px]">Status</TableHead>
+                          <TableHead className="hidden md:table-cell min-w-[120px]">Registrar</TableHead>
+                          <TableHead className="hidden lg:table-cell min-w-[140px]">Tanggal Kadaluarsa</TableHead>
+                          <TableHead className="min-w-[80px]">Action</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -374,21 +379,26 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                           assets.domains.map((domain) => (
                             <TableRow key={domain.tokenId}>
                               <TableCell className="font-medium">
-                                <div className="flex items-center gap-2">
-                                  <Globe className="h-4 w-4 text-blue-500" />
-                                  {domain.name}
+                                <div className="flex flex-col gap-1">
+                                  <div className="flex items-center gap-2">
+                                    <Globe className="h-4 w-4 text-blue-500" />
+                                    <span className="text-sm">{domain.name}</span>
+                                  </div>
+                                  <div className="md:hidden text-xs text-muted-foreground">
+                                    {domain.tokenizedValue} ETH • {domain.isActive ? 'Aktif' : 'Tidak Aktif'}
+                                  </div>
                                 </div>
                               </TableCell>
-                              <TableCell className="font-mono">
+                              <TableCell className="font-mono hidden md:table-cell">
                                 {domain.tokenizedValue} ETH
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="hidden md:table-cell">
                                 {getStatusBadge(domain.isActive)}
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="hidden md:table-cell">
                                 <Badge variant="outline">{domain.registrar}</Badge>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="hidden lg:table-cell">
                                 <div className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 text-muted-foreground" />
                                   {formatDate(domain.expirationDate)}
@@ -415,15 +425,15 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
 
                 {/* DIDs Tab */}
                 <TabsContent value="dids" className="space-y-4">
-                  <div className="rounded-md border">
+                  <div className="rounded-md border overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>DID Identifier</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Controller</TableHead>
-                          <TableHead>Dibuat</TableHead>
-                          <TableHead>Action</TableHead>
+                          <TableHead className="min-w-[200px]">DID Identifier</TableHead>
+                          <TableHead className="min-w-[100px]">Status</TableHead>
+                          <TableHead className="hidden md:table-cell min-w-[120px]">Controller</TableHead>
+                          <TableHead className="hidden lg:table-cell min-w-[100px]">Dibuat</TableHead>
+                          <TableHead className="min-w-[80px]">Action</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -437,18 +447,23 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                           assets.dids.map((did) => (
                             <TableRow key={did.didId}>
                               <TableCell className="font-medium">
-                                <div className="flex items-center gap-2">
-                                  <Shield className="h-4 w-4 text-green-500" />
-                                  <code className="text-xs">{did.didId}</code>
+                                <div className="flex flex-col gap-1">
+                                  <div className="flex items-center gap-2">
+                                    <Shield className="h-4 w-4 text-green-500" />
+                                    <code className="text-xs break-all">{did.didId}</code>
+                                  </div>
+                                  <div className="md:hidden text-xs text-muted-foreground">
+                                    {did.isActive ? 'Aktif' : 'Tidak Aktif'} • {formatDate(did.createdAt)}
+                                  </div>
                                 </div>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="hidden md:table-cell">
                                 {getStatusBadge(did.isActive)}
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="hidden md:table-cell">
                                 <code className="text-xs">{did.controller.slice(0, 10)}...{did.controller.slice(-4)}</code>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="hidden lg:table-cell">
                                 {formatDate(did.createdAt)}
                               </TableCell>
                               <TableCell>
@@ -472,14 +487,14 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
 
                 {/* Tokens Tab */}
                 <TabsContent value="tokens" className="space-y-4">
-                  <div className="rounded-md border">
+                  <div className="rounded-md border overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Token</TableHead>
-                          <TableHead>Balance</TableHead>
-                          <TableHead>Contract Address</TableHead>
-                          <TableHead>Action</TableHead>
+                          <TableHead className="min-w-[150px]">Token</TableHead>
+                          <TableHead className="min-w-[120px]">Balance</TableHead>
+                          <TableHead className="hidden md:table-cell min-w-[150px]">Contract Address</TableHead>
+                          <TableHead className="min-w-[80px]">Action</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -488,16 +503,21 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
                                 <Coins className="h-4 w-4 text-yellow-500" />
-                                <div>
-                                  <p className="font-medium">{token.name}</p>
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-medium truncate">{token.name}</p>
                                   <p className="text-sm text-muted-foreground">{token.symbol}</p>
+                                  <div className="md:hidden text-xs text-muted-foreground mt-1">
+                                    {token.contractAddress === 'native' ? 'Native ETH' : `${token.contractAddress.slice(0, 8)}...`}
+                                  </div>
                                 </div>
                               </div>
                             </TableCell>
                             <TableCell className="font-mono">
-                              {formatBalance(token.balance, token.symbol)}
+                              <div className="text-sm">
+                                {formatBalance(token.balance, token.symbol)}
+                              </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden md:table-cell">
                               {token.contractAddress === 'native' ? (
                                 <Badge variant="outline">Native ETH</Badge>
                               ) : (
