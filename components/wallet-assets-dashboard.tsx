@@ -278,29 +278,52 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                     filteredDomains.map((domain) => (
                       <TableRow key={domain.tokenId} className="hover:bg-muted/50">
                         <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            <Globe className="h-4 w-4 text-blue-500" />
-                            {domain.name}
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <Globe className="h-4 w-4 text-blue-500" />
+                              <span>{domain.name}</span>
+                              {domain.isSynthetic && (
+                                <Badge variant="outline" className="text-xs">Synthetic</Badge>
+                              )}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              Token ID: {domain.tokenId} • Value: {domain.tokenizedValue} ETH
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge 
-                            className={domain.isActive 
-                              ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900 dark:text-green-300" 
-                              : "bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900 dark:text-red-300"
-                            }
-                          >
-                            {domain.isActive ? "Active" : "Inactive"}
-                          </Badge>
+                          <div className="flex flex-col gap-1">
+                            <Badge
+                              className={domain.isActive
+                                ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900 dark:text-green-300"
+                                : "bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900 dark:text-red-300"
+                              }
+                            >
+                              {domain.isActive ? "Active" : "Inactive"}
+                            </Badge>
+                          </div>
                         </TableCell>
                         <TableCell>
-                          <span className="text-muted-foreground">{domain.registrar}</span>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-muted-foreground text-sm">{domain.registrar}</span>
+                            {domain.registrarIanaId && (
+                              <span className="text-xs text-muted-foreground">IANA: {domain.registrarIanaId}</span>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1 text-muted-foreground">
                             <Clock className="h-3 w-3" />
-                            {formatDate(domain.expirationDate)}
+                            <span className="text-sm">{formatDate(domain.expirationDate)}</span>
                           </div>
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          <Badge
+                            variant={domain.isTransferLocked ? "destructive" : "outline"}
+                            className="text-xs"
+                          >
+                            {domain.isTransferLocked ? "🔒 Locked" : "🔓 Unlocked"}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
