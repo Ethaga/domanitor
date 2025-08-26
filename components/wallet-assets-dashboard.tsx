@@ -256,6 +256,7 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                     <TableHead className="font-medium">STATUS</TableHead>
                     <TableHead className="font-medium">REGISTRAR</TableHead>
                     <TableHead className="font-medium">EXPIRATION</TableHead>
+                    <TableHead className="font-medium hidden lg:table-cell">LOCK STATUS</TableHead>
                     <TableHead className="font-medium">ACTIONS</TableHead>
                   </TableRow>
                 </TableHeader>
