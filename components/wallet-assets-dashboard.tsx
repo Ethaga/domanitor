@@ -206,16 +206,40 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
           <nav className="text-sm text-muted-foreground mb-2">
             My Account | Portfolio
           </nav>
-          <h1 className="text-2xl font-bold">Domains</h1>
+          <h1 className="text-2xl font-bold">Doma Tokenized Domains</h1>
           {walletAddress && (
-            <p className="text-sm text-muted-foreground mt-1">
-              Wallet: <span className="font-mono">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
-            </p>
+            <div className="flex flex-col gap-1 mt-1">
+              <p className="text-sm text-muted-foreground">
+                Wallet: <span className="font-mono">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+              </p>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  Doma Smart Contracts
+                </Badge>
+                {isDomaTestnet && (
+                  <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-300">
+                    ✓ Testnet Connected
+                  </Badge>
+                )}
+              </div>
+            </div>
           )}
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-          BRIDGE A DOMAIN
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            className="text-purple-600 border-purple-600 hover:bg-purple-50"
+            disabled={!isConnected}
+          >
+            Request Tokenization
+          </Button>
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={!isConnected}
+          >
+            BRIDGE A DOMAIN
+          </Button>
+        </div>
       </div>
 
       {/* Network Status */}
