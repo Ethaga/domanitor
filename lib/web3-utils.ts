@@ -500,7 +500,10 @@ export class DomaWeb3Service {
 
   async subscribeToEvents(walletAddress: string, callback: (event: any) => void): Promise<void> {
     try {
-      // Subscribe to domain transfers
+      // Subscribe to Doma Smart Contracts events
+      await this.domaSmartContracts.subscribeToEvents(walletAddress, callback)
+
+      // Legacy event subscriptions for backward compatibility
       this.domainContract.events.Transfer({
         filter: { to: walletAddress }
       }, (error: any, event: any) => {
