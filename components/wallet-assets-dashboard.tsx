@@ -14,6 +14,13 @@ import {
   DOMA_TESTNET_CONFIG
 } from "@/lib/web3-utils"
 import {
+  type DomaDomainAsset,
+  type TokenizationResult,
+  type BridgeResult,
+  type ClaimResult,
+  type DetokenizationResult
+} from "@/lib/doma-smart-contracts"
+import {
   Wallet,
   Globe,
   RefreshCw,
