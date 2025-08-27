@@ -21,15 +21,15 @@ export async function GET(req: NextRequest) {
     const txHashes = subgraph.transactions.map(t => t.transactionHash).filter(Boolean)
     const explorer = await validateOnExplorer(txHashes)
 
-    return NextResponse.json({
+    return new NextResponse(JSON.stringify({
       timeframe,
       subgraph,
       orderbook,
       fractional,
       explorer
-    })
+    }), { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } })
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? 'Aggregation failed' }, { status: 500 })
+    return new NextResponse(JSON.stringify({ error: e?.message ?? 'Aggregation failed' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } })
   }
 }
 

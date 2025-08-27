@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -45,10 +45,18 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
   const [isDomaTestnet, setIsDomaTestnet] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
 
-  const web3Service = createDomaWeb3Service(provider)
+  const web3Service = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      return createDomaWeb3Service(provider)
+    } catch (e) {
+      console.warn('[WalletAssetsDashboard] Web3 service init failed:', e)
+      return null
+    }
+  }, [provider])
 
   const checkNetwork = useCallback(async () => {
-    if (!provider) return
+    if (!provider || !web3Service) return
     try {
       const isCorrectNetwork = await web3Service.isConnectedToDomaTestnet()
       setIsDomaTestnet(isCorrectNetwork)
@@ -59,7 +67,7 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
   }, [provider, web3Service])
 
   const loadAssets = useCallback(async () => {
-    if (!isConnected || !walletAddress) return
+    if (!isConnected || !walletAddress || !web3Service) return
 
     setLoading(true)
     setError("")
@@ -68,7 +76,12 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
       const walletAssets = await web3Service.getAllWalletAssets(walletAddress)
       setAssets(walletAssets)
     } catch (err) {
-      setError("Gagal memuat aset wallet. Menampilkan data simulasi.")
+      const isInfuraMissing = typeof process !== 'undefined' && !process.env.NEXT_PUBLIC_INFURA_ID
+      setError(
+        isInfuraMissing
+          ? "RPC tidak dikonfigurasi (NEXT_PUBLIC_INFURA_ID kosong). Menampilkan data simulasi."
+          : "Gagal memuat aset wallet. Menampilkan data simulasi."
+      )
       console.error("Error loading wallet assets:", err)
 
       // Fallback to simulated data with more realistic domain names

@@ -5,5 +5,5 @@ export async function GET(_req: NextRequest, { params }: { params: { address: st
   const { address } = params
   const res = await forwardToDomaRest(`v1/smart-contracts/${address}`)
   const data = await res.text()
-  return new NextResponse(data, { status: res.status, headers: { 'Content-Type': 'application/json' } })
+  return new NextResponse(data, { status: res.status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } })
 }
