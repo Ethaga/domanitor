@@ -238,6 +238,43 @@ export interface DomaSubgraphData {
 
 // Enhanced API functions for Doma Protocol integration
 export class DomaAPI {
+  // Aggregate analytics from Subgraph, Orderbook, Fractionalization via API route
+  static async getDomaAnalytics(timeframe: '24h' | '7d' | '30d') {
+    try {
+      const res = await fetch(`/api/aggregate?timeframe=${encodeURIComponent(timeframe)}`, { cache: 'no-store' })
+      if (res.ok) {
+        const data = await res.json()
+        const volume = Math.max(0, Number(data?.orderbook?.volumeUsd) || 0)
+        const transactions = (data?.subgraph?.transactions?.length as number) || 0
+        const uniqueUsers = (data?.subgraph?.uniqueUsers as number) || 0
+        const averagePrice = transactions > 0 ? volume / transactions : 0
+        const floorPrice = Number(this.getSubgraphData ? 0 : 0) // placeholder; retained for type parity
+        const topDomains = [] as Array<any>
+        const recentTransactions = (data?.subgraph?.transactions as Array<any>)?.slice(0, 20) || []
+        return {
+          volume,
+          transactions,
+          uniqueUsers,
+          averagePrice,
+          floorPrice,
+          topDomains,
+          recentTransactions
+        }
+      }
+    } catch (e) {
+      console.warn('[DomaAPI] getDomaAnalytics failed, falling back:', e)
+    }
+    // Fallback minimal
+    return {
+      volume: 0,
+      transactions: 0,
+      uniqueUsers: 0,
+      averagePrice: 0,
+      floorPrice: 0,
+      topDomains: [],
+      recentTransactions: []
+    }
+  }
   
   // Poll API Implementation
   static async pollEvents(
