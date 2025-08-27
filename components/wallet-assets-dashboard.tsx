@@ -20,6 +20,7 @@ import {
   type ClaimResult,
   type DetokenizationResult
 } from "@/lib/doma-smart-contracts"
+import { DOMA_SMART_CONTRACTS } from "@/lib/doma-smart-contracts"
 import {
   Wallet,
   Globe,
@@ -376,7 +377,7 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                             </Button>
                             <Button variant="ghost" size="sm" asChild>
                               <a
-                                href={`https://sepolia.etherscan.io/token/${domain.tokenId}`}
+                                href={`https://sepolia.etherscan.io/nft/${DOMA_SMART_CONTRACTS.OWNERSHIP_TOKEN}/${domain.tokenId}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-muted-foreground hover:text-foreground"
