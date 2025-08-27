@@ -10,7 +10,7 @@ interface GraphQLResponse<T> {
 
 async function postGraphQL<T>(query: string, variables?: Record<string, any>): Promise<T | null> {
   try {
-    const res = await fetch(DOMA_ENDPOINTS.subgraph, {
+    const res = await fetch('/api/doma/subgraph', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -124,9 +124,7 @@ export async function getOrderbookVolumeAndLiquidity(timeframe: Timeframe): Prom
   try {
     const params = new URLSearchParams()
     params.set('limit', '200')
-    const res = await fetch(`${DOMA_ENDPOINTS.poll}?${params.toString()}`, {
-      headers: { 'Authorization': `Bearer ${DOMA_API_KEY}` }
-    })
+    const res = await fetch(`/api/doma/poll?${params.toString()}`)
     if (res.ok) {
       const json = await res.json() as { events?: Array<{ type?: string; timestamp?: string; data?: any }> }
       const cutoff = Date.now() - timeframeToMs(timeframe)
@@ -194,9 +192,7 @@ export async function getFractionalizationRevenueAndPotential(timeframe: Timefra
   try {
     const params = new URLSearchParams()
     params.set('limit', '200')
-    const res = await fetch(`${DOMA_ENDPOINTS.poll}?${params.toString()}`, {
-      headers: { 'Authorization': `Bearer ${DOMA_API_KEY}` }
-    })
+    const res = await fetch(`/api/doma/poll?${params.toString()}`)
     if (res.ok) {
       const json = await res.json() as { events?: Array<{ type?: string; timestamp?: string; data?: any }> }
       json.events?.forEach(evt => {
