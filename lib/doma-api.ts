@@ -15,28 +15,28 @@ export interface DomaConfig {
 
 export const DOMA_CONFIG: DomaConfig = {
   testnetUrl: "https://start.doma.xyz",
-  d3ApiUrl: "https://api-testnet.doma.xyz/v1",
+  d3ApiUrl: "/api/doma", // use internal proxy base for REST
   forgeApiUrl: "https://forge.doma.xyz/api",
   contractAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e",
   chainId: 11155111, // Sepolia testnet
   websocketUrl: "wss://api-testnet.doma.xyz/ws",
-  graphqlUrl: "https://api-testnet.doma.xyz/graphql",
-  pollApiUrl: "https://api-testnet.doma.xyz/v1/poll",
-  smartContractsApiUrl: "https://api-testnet.doma.xyz/v1/smart-contracts"
+  graphqlUrl: "/api/doma/subgraph",
+  pollApiUrl: "/api/doma/poll",
+  smartContractsApiUrl: "/api/doma/smart-contracts"
 }
 
 // Updated Doma Protocol API endpoints
 export const DOMA_ENDPOINTS = {
-  subgraph: "https://api-testnet.doma.xyz/graphql",
-  orderbook: "https://api-testnet.doma.xyz/v1/orderbook",
+  subgraph: "/api/doma/subgraph",
+  orderbook: "/api/doma/orderbook",
   websocket: "wss://api-testnet.doma.xyz/ws",
-  poll: "https://api-testnet.doma.xyz/v1/poll",
-  pollAck: "https://api-testnet.doma.xyz/v1/poll/ack",
-  smartContracts: "https://api-testnet.doma.xyz/v1/smart-contracts"
+  poll: "/api/doma/poll",
+  pollAck: "/api/doma/poll/ack",
+  smartContracts: "/api/doma/smart-contracts"
 }
 
 // Updated API Key
-export const DOMA_API_KEY = "v1.954d51b4e76bfda49d1ef7cd3869797b005f9a8558c2c6e4c8d2c642b24e80ca"
+export const DOMA_API_KEY = "" // handled server-side via internal proxy
 
 // Poll API Event Types
 export type PollEventType = 
@@ -90,8 +90,8 @@ const initializeDomaClient = () => {
     try {
       domaClient = createDomaOrderbookClient({
         apiClientOptions: {
-          baseUrl: DOMA_CONFIG.d3ApiUrl,
-          apiKey: DOMA_API_KEY,
+          // point SDK to internal proxies
+          baseUrl: `${DOMA_CONFIG.d3ApiUrl}/orderbook`,
         },
       })
     } catch (error) {
@@ -415,7 +415,7 @@ export class DomaAPI {
 
     try {
       // Step 1: Request tokenization voucher from Doma Protocol
-      const voucherResponse = await fetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/request`, {
+      const voucherResponse = await fetch(`/api/doma/tokenization/request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -446,7 +446,7 @@ export class DomaAPI {
       while (attempts < maxAttempts) {
         await new Promise((resolve) => setTimeout(resolve, 6000))
 
-        const statusResponse = await fetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/status/${correlationId}`, {
+        const statusResponse = await fetch(`/api/doma/tokenization/status/${correlationId}`, {
           headers: {
             "Authorization": `Bearer ${DOMA_API_KEY}`,
           },
