@@ -10,10 +10,10 @@ export const DOMA_SMART_CONTRACTS = {
   // Forwarder (standalone testnet)
   DOMA_FORWARDER: '0xf17beC16794e018E2F0453a1282c3DA3d121f410',
   
-  // Active network: Sepolia testnet
-  DOMA_GATEWAY: '0xEC67EfB227218CCc3c7032a6507339E7B4D623Ad',
-  DOMA_RECORD_PROXY: '0xD9A0E86AACf2B01013728fcCa9F00093B9b4F3Ff',
-  OWNERSHIP_TOKEN: '0x9A374915648f1352827fFbf0A7bB5752b6995eB7'
+  // Active network: configurable via env, defaults to Sepolia addresses
+  DOMA_GATEWAY: (process.env.NEXT_PUBLIC_DOMA_GATEWAY as string) || '0xEC67EfB227218CCc3c7032a6507339E7B4D623Ad',
+  DOMA_RECORD_PROXY: (process.env.NEXT_PUBLIC_DOMA_RECORD_PROXY as string) || '0xD9A0E86AACf2B01013728fcCa9F00093B9b4F3Ff',
+  OWNERSHIP_TOKEN: (process.env.NEXT_PUBLIC_DOMA_OWNERSHIP_TOKEN as string) || '0x9A374915648f1352827fFbf0A7bB5752b6995eB7'
 }
 
 // Full deployments map for reference and potential multi-network use
@@ -49,15 +49,15 @@ export const DOMA_DEPLOYMENTS = {
 
 // Doma testnet chain configuration
 export const DOMA_CHAIN_CONFIG = {
-  chainId: '0xaa36a7', // Sepolia testnet (11155111)
-  chainName: 'Doma Testnet (Sepolia)',
+  chainId: '0x1', // Ethereum mainnet (1)
+  chainName: 'Doma Mainnet (Ethereum)',
   nativeCurrency: {
     name: 'Ethereum',
     symbol: 'ETH',
     decimals: 18
   },
-  rpcUrls: ['https://sepolia.infura.io/v3/'],
-  blockExplorerUrls: ['https://sepolia.etherscan.io']
+  rpcUrls: ['https://mainnet.infura.io/v3/'],
+  blockExplorerUrls: ['https://etherscan.io']
 }
 
 // Structs and Interfaces
@@ -349,12 +349,12 @@ export class DomaSmartContractsService {
     if (provider) {
       this.web3 = new Web3(provider)
     } else {
-      // Fallback to Sepolia RPC via Infura using env var
+      // Fallback to Ethereum mainnet RPC via Infura using env var
       const infuraId = process.env.NEXT_PUBLIC_INFURA_ID
       if (!infuraId) {
-        throw new Error('[Config] NEXT_PUBLIC_INFURA_ID is not set for Sepolia RPC')
+        throw new Error('[Config] NEXT_PUBLIC_INFURA_ID is not set for mainnet RPC')
       }
-      this.web3 = new Web3(`https://sepolia.infura.io/v3/${infuraId}`)
+      this.web3 = new Web3(`https://mainnet.infura.io/v3/${infuraId}`)
     }
 
     this.recordProxyContract = new this.web3.eth.Contract(
@@ -658,7 +658,7 @@ export class DomaSmartContractsService {
   async isConnectedToDomaTestnet(): Promise<boolean> {
     try {
       const chainId = await this.web3.eth.getChainId()
-      return chainId === 11155111 // Sepolia testnet
+      return chainId === 1 // Ethereum mainnet
     } catch (error) {
       console.error('[DomaSmartContracts] Error checking chain:', error)
       return false

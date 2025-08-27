@@ -163,12 +163,12 @@ export class DomaWeb3Service {
     if (provider) {
       this.web3 = new Web3(provider)
     } else {
-      // Fallback to Sepolia RPC via Infura using env var
+      // Fallback to Ethereum mainnet RPC via Infura using env var
       const infuraId = process.env.NEXT_PUBLIC_INFURA_ID
       if (!infuraId) {
-        throw new Error('[Config] NEXT_PUBLIC_INFURA_ID is not set for Sepolia RPC')
+        throw new Error('[Config] NEXT_PUBLIC_INFURA_ID is not set for mainnet RPC')
       }
-      this.web3 = new Web3(`https://sepolia.infura.io/v3/${infuraId}`)
+      this.web3 = new Web3(`https://mainnet.infura.io/v3/${infuraId}`)
     }
 
     // Initialize Doma Smart Contracts service
