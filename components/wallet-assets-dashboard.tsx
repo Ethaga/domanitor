@@ -261,10 +261,10 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
         <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
           <AlertTriangle className="h-4 w-4 text-orange-600" />
           <AlertDescription className="flex items-center justify-between">
-            <span>You are not connected to Doma Testnet (Sepolia). Switch to view real assets.</span>
+            <span>You are not connected to Doma Mainnet (Ethereum). Switch to view real assets.</span>
             <Button onClick={switchToDomaTestnet} size="sm" className="ml-4">
               <Network className="h-4 w-4 mr-2" />
-              Switch to Doma Testnet
+              Switch to Doma Mainnet
             </Button>
           </AlertDescription>
         </Alert>
@@ -390,7 +390,7 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
                             </Button>
                             <Button variant="ghost" size="sm" asChild>
                               <a
-                                href={`https://sepolia.etherscan.io/nft/${DOMA_SMART_CONTRACTS.OWNERSHIP_TOKEN}/${domain.tokenId}`}
+                                href={`${process.env.NEXT_PUBLIC_ETHERSCAN_BASE || 'https://etherscan.io'}/nft/${DOMA_SMART_CONTRACTS.OWNERSHIP_TOKEN}/${domain.tokenId}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-muted-foreground hover:text-foreground"

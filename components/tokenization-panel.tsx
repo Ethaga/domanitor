@@ -205,7 +205,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
                 <AlertDescription className="flex items-center gap-2">
                   <span>Transaction successful!</span>
                   <Button variant="ghost" size="sm" asChild>
-                    <a href={`https://sepolia.etherscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`${process.env.NEXT_PUBLIC_ETHERSCAN_BASE || 'https://etherscan.io'}/tx/${txHash}`} target="_blank" rel="noopener noreferrer">
                       <ExternalLink className="h-3 w-3" />
                       View on Explorer
                     </a>

@@ -14,12 +14,12 @@ export interface DomaConfig {
 }
 
 export const DOMA_CONFIG: DomaConfig = {
-  testnetUrl: "https://start.doma.xyz",
+  testnetUrl: "https://doma.xyz",
   d3ApiUrl: "/api/doma", // use internal proxy base for REST
   forgeApiUrl: "https://forge.doma.xyz/api",
   contractAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e",
-  chainId: 11155111, // Sepolia testnet
-  websocketUrl: "wss://api-testnet.doma.xyz/ws",
+  chainId: 1, // Ethereum mainnet
+  websocketUrl: process.env.DOMA_WEBSOCKET_URL || "wss://api.doma.xyz/ws",
   graphqlUrl: "/api/doma/subgraph",
   pollApiUrl: "/api/doma/poll",
   smartContractsApiUrl: "/api/doma/smart-contracts"
@@ -29,7 +29,7 @@ export const DOMA_CONFIG: DomaConfig = {
 export const DOMA_ENDPOINTS = {
   subgraph: "/api/doma/subgraph",
   orderbook: "/api/doma/orderbook",
-  websocket: "wss://api-testnet.doma.xyz/ws",
+  websocket: process.env.NEXT_PUBLIC_DOMA_WS || process.env.DOMA_WEBSOCKET_URL || "wss://api.doma.xyz/ws",
   poll: "/api/doma/poll",
   pollAck: "/api/doma/poll/ack",
   smartContracts: "/api/doma/smart-contracts"

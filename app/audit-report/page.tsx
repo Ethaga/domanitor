@@ -64,7 +64,7 @@ export default function AuditReportPage() {
                     <strong>Audit Type:</strong> Smart Contract Security Review
                   </p>
                   <p>
-                    <strong>Blockchain:</strong> Ethereum (Doma Testnet)
+                    <strong>Blockchain:</strong> Ethereum (Doma Mainnet)
                   </p>
                   <p>
                     <strong>Status:</strong> <Badge className="bg-green-100 text-green-800">Passed</Badge>
