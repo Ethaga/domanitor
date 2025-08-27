@@ -349,8 +349,12 @@ export class DomaSmartContractsService {
     if (provider) {
       this.web3 = new Web3(provider)
     } else {
-      // Fallback to Sepolia RPC
-      this.web3 = new Web3('https://sepolia.infura.io/v3/your-project-id')
+      // Fallback to Sepolia RPC via Infura using env var
+      const infuraId = process.env.NEXT_PUBLIC_INFURA_ID
+      if (!infuraId) {
+        throw new Error('[Config] NEXT_PUBLIC_INFURA_ID is not set for Sepolia RPC')
+      }
+      this.web3 = new Web3(`https://sepolia.infura.io/v3/${infuraId}`)
     }
 
     this.recordProxyContract = new this.web3.eth.Contract(
