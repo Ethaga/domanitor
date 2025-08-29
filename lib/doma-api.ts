@@ -1,56 +1,21 @@
-query ExampleQuery($name: String!, $tokensName2: String!, $tokenId: String!, $correlationId: String!, $nameActivitiesName2: String!, $tokenActivitiesTokenId2: String!, $nameStatisticsTokenId2: String!, $timeRange: StatisticsTimeRange!, $dailyTransactionCountTimeRange2: StatisticsTimeRange!, $dailyCumulativeTokenizationCountTimeRange2: StatisticsTimeRange!, $dailyTokenizationCountTimeRange2: StatisticsTimeRange!, $dailyRevenueTimeRange2: StatisticsTimeRange!) {
-  names {
-    
+// lib/doma-api.ts
+const BASE_URL = process.env.DOMA_API_URL || "https://api-testnet.doma.xyz";
+const API_KEY = process.env.DOMA_API_KEY || "";
+
+export async function apiRequest(path: string, options: RequestInit = {}) {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      "Api-Key": API_KEY,
+      ...(options.headers || {}),
+    },
+    ...options,
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`API Error ${res.status}: ${err}`);
   }
-  name(name: $name) {
-    
-  }
-  tokens(name: $tokensName2) {
-    
-  }
-  token(tokenId: $tokenId) {
-    
-  }
-  fractionalTokens {
-    
-  }
-  fractionalTokenBalances {
-    
-  }
-  command(correlationId: $correlationId) {
-    
-  }
-  nameActivities(name: $nameActivitiesName2) {
-    
-  }
-  tokenActivities(tokenId: $tokenActivitiesTokenId2) {
-    
-  }
-  listings {
-    
-  }
-  offers {
-    
-  }
-  nameStatistics(tokenId: $nameStatisticsTokenId2) {
-    
-  }
-  chainStatistics {
-    
-  }
-  dailyActiveWallets(timeRange: $timeRange) {
-    
-  }
-  dailyTransactionCount(timeRange: $dailyTransactionCountTimeRange2) {
-    
-  }
-  dailyCumulativeTokenizationCount(timeRange: $dailyCumulativeTokenizationCountTimeRange2) {
-    
-  }
-  dailyTokenizationCount(timeRange: $dailyTokenizationCountTimeRange2) {
-    
-  }
-  dailyRevenue(timeRange: $dailyRevenueTimeRange2) {
-    
-  }
+
+  return res.json();
 }
