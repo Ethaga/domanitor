@@ -9,8 +9,28 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "isolatedModules": true,
-    "lib": ["es2022", "dom"]
+    "lib": [
+      "es2022",
+      "dom"
+    ],
+    "noEmit": true,
+    "incremental": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["app/**/*", "components/**/*", "lib/**/*"],
-  "exclude": ["node_modules", ".next", "dist"]
+  "include": [
+    "app/**/*",
+    "components/**/*",
+    "lib/**/*",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "dist"
+  ]
 }
