@@ -36,7 +36,9 @@ export const DOMA_ENDPOINTS = {
 }
 
 // Updated API Key
-export const DOMA_API_KEY = "v1.954d51b4e76bfda49d1ef7cd3869797b005f9a8558c2c6e4c8d2c642b24e80ca"
+export const DOMA_API_KEY = "v1.954d51b4e76bfda49d1ef7cd3869797b005f9a8558c2c6e4c8d2c642b24e80ca";
+
+export const DOMA_USE_SIMULATION = process.env.NEXT_PUBLIC_DOMA_SIMULATION_ONLY === 'true'
 
 // Poll API Event Types
 export type PollEventType = 
@@ -455,60 +457,9 @@ export class DomaAPI {
   }
 
   static async getDomainTokens(walletAddress: string): Promise<DomainToken[]> {
-    console.log('[DomaAPI] Fetching domain tokens from updated API for:', walletAddress)
+    console.log('[DomaAPI] Fetching domain tokens for:', walletAddress)
 
-    try {
-      // Try to use the updated subgraph endpoint
-      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${DOMA_API_KEY}`,
-        },
-        body: JSON.stringify({
-          query: `
-            query GetDomainTokens($owner: String!) {
-              domains(where: { owner: $owner }) {
-                id
-                name
-                tokenId
-                owner
-                registrant
-                expirationDate
-                createdAt
-                registrar
-                isTokenized
-              }
-            }
-          `,
-          variables: { owner: walletAddress.toLowerCase() }
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        if (data.data?.domains) {
-          return data.data.domains.map((domain: any) => ({
-            id: domain.id,
-            name: domain.name,
-            owner: domain.owner,
-            tokenId: domain.tokenId,
-            registrar: domain.registrar,
-            expirationDate: domain.expirationDate,
-            isTokenized: domain.isTokenized,
-            fractionalized: false,
-            floorPrice: Math.random() * 2 + 0.1,
-            status: 'active' as const
-          }))
-        }
-      }
-    } catch (error) {
-      console.warn('[DomaAPI] Updated subgraph failed:', error)
-    }
-
-    // Fallback to enhanced simulation data
-    console.log('[DomaAPI] Using enhanced simulation data for wallet:', walletAddress)
-    
+    // Prepare enhanced simulation data up-front
     const simulatedDomains: DomainToken[] = [
       {
         id: "doma_user_1",
@@ -560,14 +511,104 @@ export class DomaAPI {
       }
     ]
 
+    if (DOMA_USE_SIMULATION) {
+      console.log('[DomaAPI] Simulation enabled: returning local domain tokens')
+      return simulatedDomains
+    }
+
+    try {
+      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DOMA_API_KEY}`,
+        },
+        body: JSON.stringify({
+          query: `
+            query GetDomainTokens($owner: String!) {
+              domains(where: { owner: $owner }) {
+                id
+                name
+                tokenId
+                owner
+                registrant
+                expirationDate
+                createdAt
+                registrar
+                isTokenized
+              }
+            }
+          `,
+          variables: { owner: walletAddress.toLowerCase() }
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.data?.domains) {
+          return data.data.domains.map((domain: any) => ({
+            id: domain.id,
+            name: domain.name,
+            owner: domain.owner,
+            tokenId: domain.tokenId,
+            registrar: domain.registrar,
+            expirationDate: domain.expirationDate,
+            isTokenized: domain.isTokenized,
+            fractionalized: false,
+            floorPrice: Math.random() * 2 + 0.1,
+            status: 'active' as const
+          }))
+        }
+      }
+    } catch (error) {
+      console.warn('[DomaAPI] Updated subgraph failed:', error)
+    }
+
+    console.log('[DomaAPI] Using enhanced simulation data for wallet:', walletAddress)
     return simulatedDomains
   }
 
   // Enhanced subgraph data with updated endpoint
   static async getSubgraphData(): Promise<DomaSubgraphData> {
+    // Simulation short-circuit to avoid GraphQL 400s during development/demo
+    if (DOMA_USE_SIMULATION) {
+      const baseTime = Date.now()
+      return {
+        domains: [
+          {
+            id: 'doma_domain_1',
+            name: 'ethaga.ai',
+            tokenId: '0x1a2b3c',
+            owner: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            registrant: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            expirationDate: '2027-07-04T00:00:00Z',
+            createdAt: '2024-01-15T10:30:00Z',
+            registrar: 'D3 Registrar',
+            isTokenized: true
+          }
+        ],
+        transactions: [
+          {
+            id: 'doma_tx_1',
+            type: 'mint',
+            from: '0x0000000000000000000000000000000000000000',
+            to: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            tokenId: '0x1a2b3c',
+            timestamp: new Date(baseTime - 1800000).toISOString(),
+            transactionHash: '0xa1b2c3d4e5f6789a'
+          }
+        ],
+        marketMetrics: {
+          totalDomains: 1247,
+          totalVolume: '2850000',
+          floorPrice: '0.05',
+          averagePrice: '1.8'
+        }
+      }
+    }
+
     try {
       console.log('[DomaAPI] Fetching from updated subgraph endpoint')
-      
       const response = await fetch(DOMA_ENDPOINTS.subgraph, {
         method: 'POST',
         headers: {
@@ -615,9 +656,9 @@ export class DomaAPI {
           transactions: data.data.transactions || [],
           marketMetrics: {
             totalDomains: data.data.domains?.length || 0,
-            totalVolume: "2850000",
-            floorPrice: "0.05",
-            averagePrice: "1.8"
+            totalVolume: '2850000',
+            floorPrice: '0.05',
+            averagePrice: '1.8'
           }
         }
       }
@@ -625,7 +666,6 @@ export class DomaAPI {
       console.warn('[DomaAPI] Updated subgraph failed, using simulation:', error)
     }
 
-    // Enhanced simulation data
     const baseTime = Date.now()
     return {
       domains: [
@@ -654,9 +694,9 @@ export class DomaAPI {
       ],
       marketMetrics: {
         totalDomains: 1247,
-        totalVolume: "2850000",
-        floorPrice: "0.05",
-        averagePrice: "1.8"
+        totalVolume: '2850000',
+        floorPrice: '0.05',
+        averagePrice: '1.8'
       }
     }
   }
