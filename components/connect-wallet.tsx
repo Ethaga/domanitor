@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface ConnectWalletProps {
   isConnected: boolean
-  onConnect: (connected: boolean) => void
+  onConnect: (connected: boolean, address?: string) => void
 }
 
 declare global {
@@ -38,7 +38,7 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
             const account = accounts[0]
             setAddress(formatAddress(account))
             setConnectedWallet("MetaMask")
-            onConnect(true)
+            onConnect(true, account)
             return
           }
         } catch (error) {
@@ -53,7 +53,7 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
             const account = accounts[0]
             setAddress(formatAddress(account))
             setConnectedWallet("OKX Wallet")
-            onConnect(true)
+            onConnect(true, account)
             return
           }
         } catch (error) {
@@ -99,7 +99,7 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
         const account = accounts[0]
         setAddress(formatAddress(account))
         setConnectedWallet("MetaMask")
-        onConnect(true)
+        onConnect(true, account)
 
         try {
           await window.ethereum.request({
@@ -141,7 +141,7 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
         const account = accounts[0]
         setAddress(formatAddress(account))
         setConnectedWallet("OKX Wallet")
-        onConnect(true)
+        onConnect(true, account)
 
         try {
           await window.okxwallet.request({
