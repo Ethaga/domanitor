@@ -370,6 +370,7 @@ export class DomaSmartContractsService {
     fromAddress: string
   ): Promise<TokenizationResult> {
     try {
+      await this.init()
       console.log('[DomaSmartContracts] Requesting tokenization:', voucher)
 
       if (DOMA_USE_SIMULATION) {
