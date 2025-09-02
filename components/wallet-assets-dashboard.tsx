@@ -250,7 +250,7 @@ export function WalletAssetsDashboard({ walletAddress, isConnected, provider }: 
             <span>You are not connected to Doma Network Testnet. Switch to view real assets.</span>
             <Button onClick={switchToDomaTestnet} size="sm" className="ml-4">
               <Network className="h-4 w-4 mr-2" />
-              Switch to Doma Testnet
+              Switch to Doma Network Testnet
             </Button>
           </AlertDescription>
         </Alert>
