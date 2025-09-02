@@ -116,7 +116,7 @@ export function DomanitorDashboard() {
                     Audited
                   </Badge>
                   <Badge variant="secondary" className="bg-accent text-accent-foreground">
-                    Doma Testnet
+                    Doma Network
                   </Badge>
                   <Badge
                     variant="secondary"
@@ -128,13 +128,6 @@ export function DomanitorDashboard() {
                 </div>
               </div>
 
-              {/* Support Badge */}
-              <div className="hidden xl:flex items-center">
-                <Badge variant="outline" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  Supporting: Ethereum (.eth) | Solana (.sol) | BNB Chain (.bnb) | Cosmos (.cosmos)
-                </Badge>
-              </div>
 
               {/* Right Side Actions */}
               <div className="flex items-center space-x-2">
@@ -202,7 +195,7 @@ export function DomanitorDashboard() {
                 Audited
               </Badge>
               <Badge variant="secondary" className="bg-accent text-accent-foreground">
-                Doma Testnet
+                Doma Network
               </Badge>
               <Badge
                 variant="secondary"
@@ -221,7 +214,7 @@ export function DomanitorDashboard() {
             <Alert className="mb-6 border-accent bg-accent/10 rounded-lg">
               <Activity className="h-4 w-4" />
               <AlertDescription className="text-sm">
-                Connect your wallet to access Domanitor features and start tokenizing domains on Doma testnet.
+                Connect your wallet to access Domanitor features and start tokenizing domains on Doma Network.
                 <strong className="text-foreground"> All transactions are on testnet - no real funds required.</strong>
               </AlertDescription>
             </Alert>
