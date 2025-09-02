@@ -67,90 +67,25 @@ interface DomaBridgeProps {
 
 const SUPPORTED_CHAINS: SupportedChain[] = [
   {
-    id: 'ethereum',
-    name: 'Ethereum',
-    shortName: 'ETH',
-    chainId: 1,
+    id: 'doma-testnet',
+    name: 'Doma Network Testnet',
+    shortName: 'DOMA',
+    chainId: 97476,
     icon: '⟠',
     nativeCurrency: 'ETH',
-    rpcUrl: 'https://mainnet.infura.io/v3/',
-    explorerUrl: 'https://etherscan.io',
-    bridgeFee: 0.005,
-    estimatedTime: '5-10 min',
-    isTestnet: false
-  },
-  {
-    id: 'sepolia',
-    name: 'Sepolia Testnet',
-    shortName: 'SEP',
-    chainId: 11155111,
-    icon: '⟠',
-    nativeCurrency: 'ETH',
-    rpcUrl: 'https://sepolia.infura.io/v3/',
-    explorerUrl: 'https://sepolia.etherscan.io',
+    rpcUrl: 'https://rpc-testnet.doma.xyz',
+    explorerUrl: 'https://explorer-testnet.doma.xyz',
     bridgeFee: 0.001,
     estimatedTime: '2-5 min',
     isTestnet: true
-  },
-  {
-    id: 'polygon',
-    name: 'Polygon',
-    shortName: 'MATIC',
-    chainId: 137,
-    icon: '🔷',
-    nativeCurrency: 'MATIC',
-    rpcUrl: 'https://polygon-rpc.com',
-    explorerUrl: 'https://polygonscan.com',
-    bridgeFee: 0.1,
-    estimatedTime: '3-7 min',
-    isTestnet: false
-  },
-  {
-    id: 'arbitrum',
-    name: 'Arbitrum One',
-    shortName: 'ARB',
-    chainId: 42161,
-    icon: '🔵',
-    nativeCurrency: 'ETH',
-    rpcUrl: 'https://arb1.arbitrum.io/rpc',
-    explorerUrl: 'https://arbiscan.io',
-    bridgeFee: 0.002,
-    estimatedTime: '2-4 min',
-    isTestnet: false
-  },
-  {
-    id: 'optimism',
-    name: 'Optimism',
-    shortName: 'OP',
-    chainId: 10,
-    icon: '🔴',
-    nativeCurrency: 'ETH',
-    rpcUrl: 'https://mainnet.optimism.io',
-    explorerUrl: 'https://optimistic.etherscan.io',
-    bridgeFee: 0.003,
-    estimatedTime: '3-6 min',
-    isTestnet: false
-  },
-  {
-    id: 'solana',
-    name: 'Solana',
-    shortName: 'SOL',
-    chainId: 0, // Solana doesn't use EVM chain IDs
-    icon: '☀️',
-    nativeCurrency: 'SOL',
-    rpcUrl: 'https://api.mainnet-beta.solana.com',
-    explorerUrl: 'https://explorer.solana.com',
-    bridgeFee: 0.01,
-    estimatedTime: '1-3 min',
-    isTestnet: false
   }
 ]
 
 export function DomaBridge({ walletAddress, isConnected }: DomaBridgeProps) {
   const [userDomains, setUserDomains] = useState<DomainToken[]>([])
   const [selectedDomain, setSelectedDomain] = useState<string>("")
-  const [fromChain, setFromChain] = useState<string>("sepolia")
-  const [toChain, setToChain] = useState<string>("polygon")
+  const [fromChain, setFromChain] = useState<string>("doma-testnet")
+  const [toChain, setToChain] = useState<string>("doma-testnet")
   const [toAddress, setToAddress] = useState<string>("")
   const [bridgeTransactions, setBridgeTransactions] = useState<BridgeTransaction[]>([])
   const [currentBridge, setCurrentBridge] = useState<BridgeTransaction | null>(null)
