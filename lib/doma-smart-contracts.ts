@@ -471,6 +471,15 @@ export class DomaSmartContractsService {
         targetOwnerAddress
       })
 
+      if (DOMA_USE_SIMULATION) {
+        await new Promise(r => setTimeout(r, 400))
+        return {
+          success: true,
+          transactionHash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}`,
+          targetChainId
+        }
+      }
+
       const currentChainId = await this.web3.eth.getChainId()
       if (currentChainId !== 97476) {
         const switched = await this.switchToDomaTestnet()
@@ -478,8 +487,8 @@ export class DomaSmartContractsService {
           return { success: false, error: 'WRONG_NETWORK' }
         }
       }
-      const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
-      if (!code || code === '0x' || code === '0x0') {
+      const deployed = await this.isProxyOrImplDeployed(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
+      if (!deployed) {
         return { success: false, error: 'CONTRACT_NOT_DEPLOYED' }
       }
       const gasEstimate = await this.recordProxyContract.methods
@@ -500,7 +509,7 @@ export class DomaSmartContractsService {
       }
     } catch (error) {
       const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Bridge failed'
-            return {
+      return {
         success: false,
         error: msg
       }
