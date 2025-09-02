@@ -192,6 +192,9 @@ export class DomaWeb3Service {
     walletAddress: string
   ): Promise<{ success: boolean; transactionHash?: string; error?: string }> {
     try {
+      if (DOMA_USE_SIMULATION) {
+        return { success: true, transactionHash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}` }
+      }
       // Create tokenization voucher
       const names = domains.map(domain => {
         const dn = (domain || '').trim().toLowerCase()
@@ -237,6 +240,9 @@ export class DomaWeb3Service {
     walletAddress: string
   ): Promise<{ success: boolean; transactionHash?: string; error?: string }> {
     try {
+      if (DOMA_USE_SIMULATION) {
+        return { success: true, transactionHash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}` }
+      }
       const proofOfContactsVoucher = DomaVoucherUtils.createProofOfContactsVoucher(
         Date.now() // registrant handle
       )
@@ -272,6 +278,9 @@ export class DomaWeb3Service {
     walletAddress: string
   ): Promise<{ success: boolean; transactionHash?: string; error?: string }> {
     try {
+      if (DOMA_USE_SIMULATION) {
+        return { success: true, transactionHash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}` }
+      }
       const result = await this.domaSmartContracts.bridge(
         tokenId,
         false, // isSynthetic
@@ -298,6 +307,9 @@ export class DomaWeb3Service {
     walletAddress: string
   ): Promise<{ success: boolean; transactionHash?: string; error?: string }> {
     try {
+      if (DOMA_USE_SIMULATION) {
+        return { success: true, transactionHash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}` }
+      }
       const result = await this.domaSmartContracts.requestDetokenization(
         tokenId,
         false, // isSynthetic
