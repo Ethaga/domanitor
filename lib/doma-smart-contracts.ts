@@ -348,12 +348,12 @@ export class DomaSmartContractsService {
       if (currentChainId !== 97476) {
         const switched = await this.switchToDomaTestnet()
         if (!switched) {
-          throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+          return { success: false, error: 'WRONG_NETWORK' }
         }
       }
       const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
       if (!code || code === '0x' || code === '0x0') {
-        throw new Error('Doma Record Proxy not deployed on Doma Network')
+        return { success: false, error: 'CONTRACT_NOT_DEPLOYED' }
       }
       const gasEstimate = await this.recordProxyContract.methods
         .requestTokenization(voucherArg, signature)
@@ -374,8 +374,7 @@ export class DomaSmartContractsService {
       }
     } catch (error) {
       const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Tokenization failed'
-      console.error('[DomaSmartContracts] Tokenization failed:', msg)
-      return {
+            return {
         success: false,
         error: msg
       }
@@ -404,12 +403,12 @@ export class DomaSmartContractsService {
       if (currentChainId !== 97476) {
         const switched = await this.switchToDomaTestnet()
         if (!switched) {
-          throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+          return { success: false, error: 'WRONG_NETWORK' }
         }
       }
       const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
       if (!code || code === '0x' || code === '0x0') {
-        throw new Error('Doma Record Proxy not deployed on Doma Network')
+        return { success: false, error: 'CONTRACT_NOT_DEPLOYED' }
       }
       const gasEstimate = await this.recordProxyContract.methods
         .claimOwnership(BigInt(tokenId), isSynthetic, pocArg, signature)
@@ -429,8 +428,7 @@ export class DomaSmartContractsService {
       }
     } catch (error) {
       const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Claim ownership failed'
-      console.error('[DomaSmartContracts] Claim ownership failed:', msg)
-      return {
+            return {
         success: false,
         error: msg
       }
@@ -456,12 +454,12 @@ export class DomaSmartContractsService {
       if (currentChainId !== 97476) {
         const switched = await this.switchToDomaTestnet()
         if (!switched) {
-          throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+          return { success: false, error: 'WRONG_NETWORK' }
         }
       }
       const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
       if (!code || code === '0x' || code === '0x0') {
-        throw new Error('Doma Record Proxy not deployed on Doma Network')
+        return { success: false, error: 'CONTRACT_NOT_DEPLOYED' }
       }
       const gasEstimate = await this.recordProxyContract.methods
         .bridge(tokenId, isSynthetic, targetChainId, targetOwnerAddress)
@@ -481,8 +479,7 @@ export class DomaSmartContractsService {
       }
     } catch (error) {
       const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Bridge failed'
-      console.error('[DomaSmartContracts] Bridge failed:', msg)
-      return {
+            return {
         success: false,
         error: msg
       }
@@ -502,12 +499,12 @@ export class DomaSmartContractsService {
       if (currentChainId !== 97476) {
         const switched = await this.switchToDomaTestnet()
         if (!switched) {
-          throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+          return { success: false, error: 'WRONG_NETWORK' }
         }
       }
       const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
       if (!code || code === '0x' || code === '0x0') {
-        throw new Error('Doma Record Proxy not deployed on Doma Network')
+        return { success: false, error: 'CONTRACT_NOT_DEPLOYED' }
       }
       const gasEstimate = await this.recordProxyContract.methods
         .requestDetokenization(tokenId, isSynthetic)
@@ -526,8 +523,7 @@ export class DomaSmartContractsService {
       }
     } catch (error) {
       const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Detokenization failed'
-      console.error('[DomaSmartContracts] Detokenization failed:', msg)
-      return {
+            return {
         success: false,
         error: msg
       }
