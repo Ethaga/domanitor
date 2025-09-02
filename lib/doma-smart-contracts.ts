@@ -346,7 +346,10 @@ export class DomaSmartContractsService {
 
       const currentChainId = await this.web3.eth.getChainId()
       if (currentChainId !== 97476) {
-        throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+        const switched = await this.switchToDomaTestnet()
+        if (!switched) {
+          throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+        }
       }
       const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
       if (!code || code === '0x' || code === '0x0') {
@@ -399,7 +402,10 @@ export class DomaSmartContractsService {
 
       const currentChainId = await this.web3.eth.getChainId()
       if (currentChainId !== 97476) {
-        throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+        const switched = await this.switchToDomaTestnet()
+        if (!switched) {
+          throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+        }
       }
       const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
       if (!code || code === '0x' || code === '0x0') {
@@ -448,7 +454,10 @@ export class DomaSmartContractsService {
 
       const currentChainId = await this.web3.eth.getChainId()
       if (currentChainId !== 97476) {
-        throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+        const switched = await this.switchToDomaTestnet()
+        if (!switched) {
+          throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+        }
       }
       const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
       if (!code || code === '0x' || code === '0x0') {
@@ -491,7 +500,10 @@ export class DomaSmartContractsService {
 
       const currentChainId = await this.web3.eth.getChainId()
       if (currentChainId !== 97476) {
-        throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+        const switched = await this.switchToDomaTestnet()
+        if (!switched) {
+          throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+        }
       }
       const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
       if (!code || code === '0x' || code === '0x0') {
