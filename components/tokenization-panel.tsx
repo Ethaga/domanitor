@@ -110,7 +110,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
           <CardContent className="space-y-4">
             {!isConnected && (
               <Alert>
-                <AlertDescription>Connect your wallet to start tokenizing domains on Doma testnet.</AlertDescription>
+                <AlertDescription>Connect your wallet to start tokenizing domains on Doma Network.</AlertDescription>
               </Alert>
             )}
 
@@ -136,7 +136,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
                   <SelectValue placeholder="Select registrar" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="D3">D3 (Doma Testnet)</SelectItem>
+                  <SelectItem value="D3">D3 (Doma Network)</SelectItem>
                   <SelectItem value="GoDaddy">GoDaddy</SelectItem>
                   <SelectItem value="Namecheap">Namecheap</SelectItem>
                   <SelectItem value="Cloudflare">Cloudflare</SelectItem>
@@ -215,7 +215,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
                 <AlertDescription className="flex items-center gap-2">
                   <span>Transaction successful!</span>
                   <Button variant="ghost" size="sm" asChild>
-                    <a href={`https://sepolia.etherscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`https://explorer-testnet.doma.xyz/tx/${txHash}`} target="_blank" rel="noopener noreferrer">
                       <ExternalLink className="h-3 w-3" />
                       View on Explorer
                     </a>
@@ -325,7 +325,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
       <Card>
         <CardHeader>
           <CardTitle>Recent Doma Protocol Activity</CardTitle>
-          <CardDescription>Latest domains tokenized on the Doma testnet</CardDescription>
+          <CardDescription>Latest domains tokenized on the Doma Network</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
