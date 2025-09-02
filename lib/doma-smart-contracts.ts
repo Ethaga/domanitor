@@ -340,6 +340,15 @@ export class DomaSmartContractsService {
     try {
       console.log('[DomaSmartContracts] Requesting tokenization:', voucher)
 
+      if (DOMA_USE_SIMULATION) {
+        await new Promise(r => setTimeout(r, 500))
+        return {
+          success: true,
+          transactionHash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}`,
+          correlationId: `corr_${Date.now()}`
+        }
+      }
+
       // Web3 4.x requires tuple args as arrays in ABI order
       const voucherArg = [
         voucher.names.map(n => [n.sld, n.tld, BigInt(n.registrarIanaId)]),
@@ -355,8 +364,8 @@ export class DomaSmartContractsService {
           return { success: false, error: 'WRONG_NETWORK' }
         }
       }
-      const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
-      if (!code || code === '0x' || code === '0x0') {
+      const deployed = await this.isProxyOrImplDeployed(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
+      if (!deployed) {
         return { success: false, error: 'CONTRACT_NOT_DEPLOYED' }
       }
       const gasEstimate = await this.recordProxyContract.methods
@@ -378,7 +387,7 @@ export class DomaSmartContractsService {
       }
     } catch (error) {
       const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Tokenization failed'
-            return {
+      return {
         success: false,
         error: msg
       }
