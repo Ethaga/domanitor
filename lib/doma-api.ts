@@ -19,7 +19,7 @@ export const DOMA_CONFIG: DomaConfig = {
   d3ApiUrl: "https://api-testnet.doma.xyz/v1",
   forgeApiUrl: "https://forge.doma.xyz/api",
   contractAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e",
-  chainId: 11155111, // Sepolia testnet
+  chainId: 97476,
   websocketUrl: "wss://api-testnet.doma.xyz/ws",
   graphqlUrl: "https://api-testnet.doma.xyz/graphql",
   pollApiUrl: "https://api-testnet.doma.xyz/v1/poll",
@@ -251,7 +251,7 @@ let MARKETPLACE_LISTINGS: DomainListing[] = [
     status: 'active',
     listedAt: new Date(Date.now() - 3600_000).toISOString(),
     tokenId: '0x1a2b3c',
-    chainId: 11155111,
+    chainId: 97476,
   },
   {
     id: 'lst_2',
@@ -262,7 +262,7 @@ let MARKETPLACE_LISTINGS: DomainListing[] = [
     status: 'active',
     listedAt: new Date(Date.now() - 7200_000).toISOString(),
     tokenId: '0x4d5e6f',
-    chainId: 11155111,
+    chainId: 97476,
   }
 ]
 let MARKETPLACE_OFFERS: DomainOffer[] = []
@@ -413,7 +413,7 @@ export class DomaAPI {
         const web3 = new DomaWeb3Service(provider)
         const switched = await web3.switchToDomaTestnet()
         if (!switched) {
-          console.warn('[DomaAPI] Could not auto-switch network; please switch to Sepolia manually')
+          console.warn('[DomaAPI] Could not auto-switch network; please switch to Doma Network manually')
         }
 
         const result = await web3.requestTokenization([request.domain], request.walletAddress)
@@ -762,7 +762,7 @@ export class DomaAPI {
       status: 'active',
       listedAt: new Date().toISOString(),
       tokenId: `0x${Math.random().toString(16).substr(2, 6)}`,
-      chainId: 11155111,
+      chainId: 97476,
     }
     MARKETPLACE_LISTINGS.unshift(listing)
     return { success: true, id }
@@ -781,7 +781,7 @@ export class DomaAPI {
       createdAt: new Date().toISOString(),
       expiresAt,
       tokenId: undefined,
-      chainId: 11155111,
+      chainId: 97476,
     }
     MARKETPLACE_OFFERS.unshift(offer)
     return { success: true, id }
