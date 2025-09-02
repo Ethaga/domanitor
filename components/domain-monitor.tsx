@@ -28,43 +28,44 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
       setDomains([
         {
           id: "1",
-          name: "user123.eth",
-          status: "active",
-          floorPrice: 25000,
-          expirationDate: "2025-12-15",
-          registrar: "ENS",
+          name: "ethaga.ai",
+          owner: "",
+          tokenId: "0x123...",
+          registrar: "D3 Registrar",
+          expirationDate: "2027-12-15T00:00:00Z",
+          isTokenized: true,
           fractionalized: true,
           totalShares: 1000,
           availableShares: 250,
-          tokenId: "0x123...",
-          chain: "ethereum",
+          floorPrice: 25000,
+          status: "active"
         },
         {
           id: "2",
-          name: "brand456.sol",
-          status: "active",
-          floorPrice: 15000,
-          expirationDate: "2025-11-20",
-          registrar: "Solana Name Service",
-          fractionalized: false,
-          totalShares: 0,
-          availableShares: 0,
+          name: "ethaga.io",
+          owner: "",
           tokenId: "0x456...",
-          chain: "solana",
+          registrar: "D3 Registrar",
+          expirationDate: "2026-11-20T00:00:00Z",
+          isTokenized: true,
+          fractionalized: false,
+          floorPrice: 15000,
+          status: "active"
         },
         {
           id: "3",
-          name: "yourname.bnb",
-          status: "pending",
-          floorPrice: 8500,
-          expirationDate: "2025-10-30",
-          registrar: "Space ID",
+          name: "ethaga.com",
+          owner: "",
+          tokenId: "0x789...",
+          registrar: "D3 Registrar",
+          expirationDate: "2026-10-30T00:00:00Z",
+          isTokenized: true,
           fractionalized: true,
           totalShares: 500,
           availableShares: 125,
-          tokenId: "0x789...",
-          chain: "bnb",
-        },
+          floorPrice: 8500,
+          status: "pending"
+        }
       ])
     }
   }, [isConnected, walletAddress])
@@ -101,32 +102,6 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
     }
   }
 
-  const getChainLogo = (chain: string) => {
-    switch (chain) {
-      case "ethereum":
-        return (
-          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-            Ξ
-          </div>
-        )
-      case "solana":
-        return (
-          <div className="w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-            ◎
-          </div>
-        )
-      case "bnb":
-        return (
-          <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-            B
-          </div>
-        )
-      case "cosmos":
-        return <div className="w-4 h-4 bg-indigo-500 rounded-full"></div>
-      default:
-        return <div className="w-4 h-4 bg-gray-500 rounded-full"></div>
-    }
-  }
 
   const filteredDomains = domains.filter((domain) => domain.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -160,7 +135,7 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
                 Connect your wallet to view your tokenized domain portfolio from Doma Protocol.
                 <br />
                 <span className="text-sm text-muted-foreground mt-1 block">
-                  Preview showing cross-chain domain examples (.eth, .sol, .bnb)
+                  Preview shows sample tokenized domains on Doma Network Testnet
                 </span>
               </AlertDescription>
             </Alert>
@@ -183,7 +158,7 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
             <Button variant="outline" asChild>
               <a href="https://start.doma.xyz" target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Doma Testnet
+                Doma Network Testnet
               </a>
             </Button>
           </div>
@@ -199,7 +174,7 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
               <TableHeader>
                 <TableRow>
                   <TableHead>Domain</TableHead>
-                  <TableHead>Chain</TableHead>
+                  <TableHead>Network</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Floor Price</TableHead>
                   <TableHead>Expiry</TableHead>
@@ -230,8 +205,8 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
                       <TableCell className="font-medium">{domain.name}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {getChainLogo(domain.chain || "ethereum")}
-                          <span className="text-xs text-muted-foreground capitalize">{domain.chain || "ethereum"}</span>
+                          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">⟠</div>
+                          <span className="text-xs text-muted-foreground">Doma Network Testnet</span>
                         </div>
                       </TableCell>
                       <TableCell>
