@@ -12,15 +12,15 @@ export const DOMA_SMART_CONTRACTS = {
 
 // Doma testnet chain configuration
 export const DOMA_CHAIN_CONFIG = {
-  chainId: '0xaa36a7', // Sepolia testnet (11155111)
-  chainName: 'Doma Testnet (Sepolia)',
+  chainId: '0x17cc4',
+  chainName: 'Doma Network',
   nativeCurrency: {
-    name: 'Ethereum',
+    name: 'ETH',
     symbol: 'ETH',
     decimals: 18
   },
-  rpcUrls: ['https://sepolia.infura.io/v3/'],
-  blockExplorerUrls: ['https://sepolia.etherscan.io']
+  rpcUrls: ['https://rpc-testnet.doma.xyz'],
+  blockExplorerUrls: ['https://explorer-testnet.doma.xyz']
 }
 
 // Structs and Interfaces
@@ -312,8 +312,8 @@ export class DomaSmartContractsService {
     if (provider) {
       this.web3 = new Web3(provider)
     } else {
-      // Fallback to Sepolia RPC
-      this.web3 = new Web3('https://sepolia.infura.io/v3/your-project-id')
+      // Fallback to Doma Network RPC
+      this.web3 = new Web3('https://rpc-testnet.doma.xyz')
     }
 
     this.recordProxyContract = new this.web3.eth.Contract(
@@ -634,7 +634,7 @@ export class DomaSmartContractsService {
   async isConnectedToDomaTestnet(): Promise<boolean> {
     try {
       const chainId = await this.web3.eth.getChainId()
-      return chainId === 11155111 // Sepolia testnet
+      return chainId === 97476
     } catch (error) {
       console.error('[DomaSmartContracts] Error checking chain:', error)
       return false
