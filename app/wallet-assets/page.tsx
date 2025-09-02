@@ -58,7 +58,7 @@ export default function WalletAssetsPage() {
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="border-blue-300 text-blue-800 dark:border-blue-700 dark:text-blue-200">
               <Network className="h-3 w-3 mr-1" />
-              Doma Testnet
+              Doma Network Testnet
             </Badge>
             <ConnectWallet
               onConnect={handleWalletConnect}
@@ -77,7 +77,7 @@ export default function WalletAssetsPage() {
                 <div className="flex items-center gap-3">
                   <Info className="h-5 w-5 text-blue-600" />
                   <div>
-                    <p className="font-medium text-blue-800 dark:text-blue-200">Connected to Doma Testnet</p>
+                    <p className="font-medium text-blue-800 dark:text-blue-200">Connected to Doma Network Testnet</p>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
                       Using Web3.js to read data from smart contracts on Doma Network Testnet
                     </p>
