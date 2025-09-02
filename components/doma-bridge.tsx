@@ -84,8 +84,8 @@ const SUPPORTED_CHAINS: SupportedChain[] = [
 export function DomaBridge({ walletAddress, isConnected }: DomaBridgeProps) {
   const [userDomains, setUserDomains] = useState<DomainToken[]>([])
   const [selectedDomain, setSelectedDomain] = useState<string>("")
-  const [fromChain, setFromChain] = useState<string>("sepolia")
-  const [toChain, setToChain] = useState<string>("polygon")
+  const [fromChain, setFromChain] = useState<string>("doma")
+  const [toChain, setToChain] = useState<string>("")
   const [toAddress, setToAddress] = useState<string>("")
   const [bridgeTransactions, setBridgeTransactions] = useState<BridgeTransaction[]>([])
   const [currentBridge, setCurrentBridge] = useState<BridgeTransaction | null>(null)
@@ -434,7 +434,7 @@ export function DomaBridge({ walletAddress, isConnected }: DomaBridgeProps) {
               <CardHeader>
                 <CardTitle>Bridge Summary</CardTitle>
                 <CardDescription>
-                  Review your bridge transaction details
+                  Doma Network only. Use the official bridge below for cross-chain actions.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -478,6 +478,12 @@ export function DomaBridge({ walletAddress, isConnected }: DomaBridgeProps) {
                     </div>
 
                     <div className="pt-4 border-t">
+                      <Button variant="outline" asChild className="w-full mb-3">
+                        <a href="https://bridge-testnet.doma.xyz" target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Open Doma Bridge
+                        </a>
+                      </Button>
                       <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg mb-4">
                         <Shield className="h-4 w-4 text-amber-600" />
                         <div className="text-sm">
