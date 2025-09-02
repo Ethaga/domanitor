@@ -10,6 +10,8 @@ import {
   DOMA_CHAIN_CONFIG
 } from './doma-smart-contracts'
 
+const DOMA_USE_SIMULATION = process.env.NEXT_PUBLIC_DOMA_SIMULATION_ONLY === 'true'
+
 // Legacy contract addresses (kept for backward compatibility)
 export const DOMA_CONTRACTS = {
   DOMA_DOMAIN_REGISTRY: DOMA_SMART_CONTRACTS.DOMA_RECORD,
