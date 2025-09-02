@@ -110,7 +110,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
           <CardContent className="space-y-4">
             {!isConnected && (
               <Alert>
-                <AlertDescription>Connect your wallet to start tokenizing domains on Doma testnet.</AlertDescription>
+                <AlertDescription>Connect your wallet to start tokenizing domains on Doma Network Testnet.</AlertDescription>
               </Alert>
             )}
 
@@ -136,7 +136,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
                   <SelectValue placeholder="Select registrar" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="D3">D3 (Doma Testnet)</SelectItem>
+                  <SelectItem value="D3">D3 (Doma Network Testnet)</SelectItem>
                   <SelectItem value="GoDaddy">GoDaddy</SelectItem>
                   <SelectItem value="Namecheap">Namecheap</SelectItem>
                   <SelectItem value="Cloudflare">Cloudflare</SelectItem>
