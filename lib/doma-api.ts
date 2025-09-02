@@ -36,8 +36,8 @@ export const DOMA_ENDPOINTS = {
   smartContracts: "https://api-testnet.doma.xyz/v1/smart-contracts"
 }
 
-// Updated API Key
-export const DOMA_API_KEY = "v1.954d51b4e76bfda49d1ef7cd3869797b005f9a8558c2c6e4c8d2c642b24e80ca";
+// Updated API Key (prefer env, fallback to demo key)
+export const DOMA_API_KEY = process.env.NEXT_PUBLIC_DOMA_API_KEY || "v1.954d51b4e76bfda49d1ef7cd3869797b005f9a8558c2c6e4c8d2c642b24e80ca";
 
 export const DOMA_USE_SIMULATION = process.env.NEXT_PUBLIC_DOMA_SIMULATION_ONLY === 'true'
 
