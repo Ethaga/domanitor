@@ -336,15 +336,24 @@ export class DomaSmartContractsService {
     try {
       console.log('[DomaSmartContracts] Requesting tokenization:', voucher)
 
+      // Web3 4.x requires tuple args as arrays in ABI order
+      const voucherArg = [
+        voucher.names.map(n => [n.sld, n.tld, BigInt(n.registrarIanaId)]),
+        BigInt(voucher.nonce),
+        BigInt(voucher.expiresAt),
+        voucher.ownerAddress
+      ]
+
       const gasEstimate = await this.recordProxyContract.methods
-        .requestTokenization(voucher, signature)
-        .estimateGas({ from: fromAddress })
+        .requestTokenization(voucherArg, signature)
+        .estimateGas({ from: fromAddress, value: '0x0' })
 
       const transaction = await this.recordProxyContract.methods
-        .requestTokenization(voucher, signature)
+        .requestTokenization(voucherArg, signature)
         .send({
           from: fromAddress,
-          gas: Math.floor(gasEstimate * 1.2), // Add 20% buffer
+          gas: Math.floor(Number(gasEstimate) * 1.2),
+          value: '0x0'
         })
 
       return {
@@ -372,15 +381,23 @@ export class DomaSmartContractsService {
     try {
       console.log('[DomaSmartContracts] Claiming ownership:', { tokenId, isSynthetic })
 
+      const pocArg = [
+        BigInt(proofOfContactsVoucher.registrantHandle),
+        Number(proofOfContactsVoucher.proofSource ?? 2),
+        BigInt(proofOfContactsVoucher.nonce),
+        BigInt(proofOfContactsVoucher.expiresAt),
+      ]
+
       const gasEstimate = await this.recordProxyContract.methods
-        .claimOwnership(tokenId, isSynthetic, proofOfContactsVoucher, signature)
-        .estimateGas({ from: fromAddress })
+        .claimOwnership(BigInt(tokenId), isSynthetic, pocArg, signature)
+        .estimateGas({ from: fromAddress, value: '0x0' })
 
       const transaction = await this.recordProxyContract.methods
-        .claimOwnership(tokenId, isSynthetic, proofOfContactsVoucher, signature)
+        .claimOwnership(BigInt(tokenId), isSynthetic, pocArg, signature)
         .send({
           from: fromAddress,
-          gas: Math.floor(gasEstimate * 1.2),
+          gas: Math.floor(Number(gasEstimate) * 1.2),
+          value: '0x0'
         })
 
       return {
