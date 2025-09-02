@@ -344,6 +344,14 @@ export class DomaSmartContractsService {
         voucher.ownerAddress
       ]
 
+      const currentChainId = await this.web3.eth.getChainId()
+      if (currentChainId !== 97476) {
+        throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+      }
+      const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
+      if (!code || code === '0x' || code === '0x0') {
+        throw new Error('Doma Record Proxy not deployed on Doma Network')
+      }
       const gasEstimate = await this.recordProxyContract.methods
         .requestTokenization(voucherArg, signature)
         .estimateGas({ from: fromAddress, value: '0x0' })
@@ -362,10 +370,11 @@ export class DomaSmartContractsService {
         correlationId: `corr_${Date.now()}`
       }
     } catch (error) {
-      console.error('[DomaSmartContracts] Tokenization failed:', error)
+      const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Tokenization failed'
+      console.error('[DomaSmartContracts] Tokenization failed:', msg)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Tokenization failed'
+        error: msg
       }
     }
   }
@@ -388,6 +397,14 @@ export class DomaSmartContractsService {
         BigInt(proofOfContactsVoucher.expiresAt),
       ]
 
+      const currentChainId = await this.web3.eth.getChainId()
+      if (currentChainId !== 97476) {
+        throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+      }
+      const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
+      if (!code || code === '0x' || code === '0x0') {
+        throw new Error('Doma Record Proxy not deployed on Doma Network')
+      }
       const gasEstimate = await this.recordProxyContract.methods
         .claimOwnership(BigInt(tokenId), isSynthetic, pocArg, signature)
         .estimateGas({ from: fromAddress, value: '0x0' })
@@ -405,10 +422,11 @@ export class DomaSmartContractsService {
         transactionHash: transaction.transactionHash
       }
     } catch (error) {
-      console.error('[DomaSmartContracts] Claim ownership failed:', error)
+      const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Claim ownership failed'
+      console.error('[DomaSmartContracts] Claim ownership failed:', msg)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Claim ownership failed'
+        error: msg
       }
     }
   }
@@ -428,6 +446,14 @@ export class DomaSmartContractsService {
         targetOwnerAddress
       })
 
+      const currentChainId = await this.web3.eth.getChainId()
+      if (currentChainId !== 97476) {
+        throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+      }
+      const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
+      if (!code || code === '0x' || code === '0x0') {
+        throw new Error('Doma Record Proxy not deployed on Doma Network')
+      }
       const gasEstimate = await this.recordProxyContract.methods
         .bridge(tokenId, isSynthetic, targetChainId, targetOwnerAddress)
         .estimateGas({ from: fromAddress })
@@ -445,10 +471,11 @@ export class DomaSmartContractsService {
         targetChainId
       }
     } catch (error) {
-      console.error('[DomaSmartContracts] Bridge failed:', error)
+      const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Bridge failed'
+      console.error('[DomaSmartContracts] Bridge failed:', msg)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Bridge failed'
+        error: msg
       }
     }
   }
@@ -462,6 +489,14 @@ export class DomaSmartContractsService {
     try {
       console.log('[DomaSmartContracts] Requesting detokenization:', tokenId)
 
+      const currentChainId = await this.web3.eth.getChainId()
+      if (currentChainId !== 97476) {
+        throw new Error('Wrong network: please switch to Doma Network (chainId 97476)')
+      }
+      const code = await this.web3.eth.getCode(DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY)
+      if (!code || code === '0x' || code === '0x0') {
+        throw new Error('Doma Record Proxy not deployed on Doma Network')
+      }
       const gasEstimate = await this.recordProxyContract.methods
         .requestDetokenization(tokenId, isSynthetic)
         .estimateGas({ from: fromAddress })
@@ -478,10 +513,11 @@ export class DomaSmartContractsService {
         transactionHash: transaction.transactionHash
       }
     } catch (error) {
-      console.error('[DomaSmartContracts] Detokenization failed:', error)
+      const msg = (error as any)?.message || (error as any)?.reason || (error as any)?.data?.message || 'Detokenization failed'
+      console.error('[DomaSmartContracts] Detokenization failed:', msg)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Detokenization failed'
+        error: msg
       }
     }
   }
