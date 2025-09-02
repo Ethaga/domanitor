@@ -309,6 +309,7 @@ export class DomaSmartContractsService {
   private web3: Web3
   private recordProxyContract: any
   private ownershipTokenContract: any
+  private initPromise: Promise<void> | null = null
 
   private static readonly EIP1967_IMPLEMENTATION_SLOT = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc'
 
@@ -319,16 +320,47 @@ export class DomaSmartContractsService {
       // Fallback to Doma Network RPC
       this.web3 = new Web3('https://rpc-testnet.doma.xyz')
     }
+  }
 
-    this.recordProxyContract = new this.web3.eth.Contract(
-      DOMA_RECORD_PROXY_ABI,
-      DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY
-    )
-    
-    this.ownershipTokenContract = new this.web3.eth.Contract(
-      OWNERSHIP_TOKEN_ABI,
-      DOMA_SMART_CONTRACTS.OWNERSHIP_TOKEN
-    )
+  private async init(): Promise<void> {
+    if (this.initPromise) return this.initPromise
+    this.initPromise = (async () => {
+      // Resolve addresses from env or Smart Contracts API
+      let recordProxy = (process.env.NEXT_PUBLIC_DOMA_RECORD_PROXY || '').trim()
+      let ownershipToken = (process.env.NEXT_PUBLIC_OWNERSHIP_TOKEN || '').trim()
+
+      if (!recordProxy || !ownershipToken) {
+        try {
+          const base = 'https://api-testnet.doma.xyz/v1/smart-contracts'
+          const res = await fetch(base, {
+            headers: {
+              'Authorization': `Bearer ${process.env.NEXT_PUBLIC_DOMA_API_KEY || ''}`
+            }
+          })
+          if (res.ok) {
+            const data = await res.json()
+            const contracts: Array<{ name: string; address: string }> = data.contracts || []
+            const rec = contracts.find(c => /record/i.test(c.name) && /proxy/i.test(c.name))
+            const own = contracts.find(c => /ownership/i.test(c.name) || /erc\s*-?721/i.test(c.name))
+            if (rec?.address) recordProxy = rec.address
+            if (own?.address) ownershipToken = own.address
+          }
+        } catch {}
+      }
+
+      const rp = recordProxy || DOMA_SMART_CONTRACTS.DOMA_RECORD_PROXY
+      const ot = ownershipToken || DOMA_SMART_CONTRACTS.OWNERSHIP_TOKEN
+
+      this.recordProxyContract = new this.web3.eth.Contract(
+        DOMA_RECORD_PROXY_ABI,
+        rp
+      )
+      this.ownershipTokenContract = new this.web3.eth.Contract(
+        OWNERSHIP_TOKEN_ABI,
+        ot
+      )
+    })()
+    return this.initPromise
   }
 
   // Request tokenization of domains
