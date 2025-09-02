@@ -79,12 +79,12 @@ export default function WalletAssetsPage() {
                   <div>
                     <p className="font-medium text-blue-800 dark:text-blue-200">Connected to Doma Testnet</p>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Using Web3.js to read data from smart contracts on Sepolia
+                      Using Web3.js to read data from smart contracts on Doma Network Testnet
                     </p>
                   </div>
                 </div>
                 <Badge variant="outline" className="border-green-300 text-green-800 dark:border-green-700 dark:text-green-200">
-                  Chain ID: 11155111
+                  Chain ID: 97476
                 </Badge>
               </div>
             </CardContent>
