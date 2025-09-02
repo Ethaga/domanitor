@@ -436,6 +436,7 @@ export class DomaSmartContractsService {
     fromAddress: string
   ): Promise<ClaimResult> {
     try {
+      await this.init()
       console.log('[DomaSmartContracts] Claiming ownership:', { tokenId, isSynthetic })
 
       if (DOMA_USE_SIMULATION) {
@@ -498,6 +499,7 @@ export class DomaSmartContractsService {
     fromAddress: string
   ): Promise<BridgeResult> {
     try {
+      await this.init()
       console.log('[DomaSmartContracts] Bridging token:', {
         tokenId,
         targetChainId,
@@ -556,6 +558,7 @@ export class DomaSmartContractsService {
     fromAddress: string
   ): Promise<DetokenizationResult> {
     try {
+      await this.init()
       console.log('[DomaSmartContracts] Requesting detokenization:', tokenId)
 
       if (DOMA_USE_SIMULATION) {
@@ -604,6 +607,7 @@ export class DomaSmartContractsService {
   // Get domain assets for a wallet with Doma-specific information
   async getDomainAssets(walletAddress: string): Promise<DomaDomainAsset[]> {
     try {
+      await this.init()
       const balance = await this.ownershipTokenContract.methods.balanceOf(walletAddress).call()
       const domains: DomaDomainAsset[] = []
 
@@ -679,6 +683,7 @@ export class DomaSmartContractsService {
   // Subscribe to Doma-specific events
   async subscribeToEvents(walletAddress: string, callback: (event: any) => void): Promise<void> {
     try {
+      await this.init()
       // Subscribe to OwnershipTokenMinted events
       this.ownershipTokenContract.events.OwnershipTokenMinted({
         filter: { to: walletAddress }
