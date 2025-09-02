@@ -183,7 +183,7 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
             <Button variant="outline" asChild>
               <a href="https://start.doma.xyz" target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Doma Testnet
+                Doma Network
               </a>
             </Button>
           </div>
@@ -262,7 +262,7 @@ export function DomainMonitor({ walletAddress, isConnected }: DomainMonitorProps
                       <TableCell>
                         <Button variant="ghost" size="sm" asChild>
                           <a
-                            href={`https://sepolia.etherscan.io/token/${domain.tokenId}`}
+                            href={`https://explorer-testnet.doma.xyz`}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
