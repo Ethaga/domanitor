@@ -680,14 +680,37 @@ export class DomaSmartContractsService {
   // Switch to Doma testnet
   async switchToDomaTestnet(): Promise<boolean> {
     try {
-      if (typeof window !== 'undefined' && window.ethereum) {
-        await window.ethereum.request({
+      if (typeof window === 'undefined') return false
+      const provider = (window as any).ethereum || (window as any).okxwallet
+      if (!provider) return false
+      try {
+        await provider.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: DOMA_CHAIN_CONFIG.chainId }],
         })
         return true
+      } catch (switchErr: any) {
+        if (switchErr?.code === 4902 || /unrecognized|not added/i.test(String(switchErr?.message || ''))) {
+          try {
+            await provider.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: DOMA_CHAIN_CONFIG.chainId,
+                chainName: DOMA_CHAIN_CONFIG.chainName,
+                nativeCurrency: DOMA_CHAIN_CONFIG.nativeCurrency,
+                rpcUrls: DOMA_CHAIN_CONFIG.rpcUrls,
+                blockExplorerUrls: DOMA_CHAIN_CONFIG.blockExplorerUrls,
+              }],
+            })
+            return true
+          } catch (addErr) {
+            console.error('[DomaSmartContracts] Add chain failed:', addErr)
+            return false
+          }
+        }
+        console.error('[DomaSmartContracts] Switch network failed:', switchErr)
+        return false
       }
-      return false
     } catch (error) {
       console.error('[DomaSmartContracts] Error switching network:', error)
       return false
