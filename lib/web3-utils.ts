@@ -192,7 +192,13 @@ export class DomaWeb3Service {
     try {
       // Create tokenization voucher
       const names = domains.map(domain => {
-        const [sld, tld] = domain.split('.')
+        const dn = (domain || '').trim().toLowerCase()
+        const parts = dn.split('.')
+        const sld = parts[0]
+        const tld = parts.slice(1).join('.')
+        if (!sld || !tld) {
+          throw new Error('Invalid domain format. Use sld.tld (e.g., example.com)')
+        }
         return {
           sld,
           tld,
