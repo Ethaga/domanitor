@@ -29,7 +29,7 @@ import {
   Clock,
   Shield
 } from "lucide-react"
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart as RechartsPieChart, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, Pie, PieChart as RechartsPieChart, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 interface AnalyticsData {
   volume: number
@@ -582,7 +582,7 @@ export function DomaAnalytics({ walletAddress, isConnected }: DomaAnalyticsProps
                             {domain.name}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {domain.registrar} • Token #{domain.tokenId}
+                            {domain.registrar} �� Token #{domain.tokenId}
                           </div>
                         </div>
                       </div>
