@@ -10,6 +10,8 @@ export const DOMA_SMART_CONTRACTS = {
   OWNERSHIP_TOKEN: '0x424bdf2e8a6f52bd2c1c81d9437b0dc0309df90f'
 }
 
+const DOMA_USE_SIMULATION = process.env.NEXT_PUBLIC_DOMA_SIMULATION_ONLY === 'true'
+
 // Doma testnet chain configuration
 export const DOMA_CHAIN_CONFIG = {
   chainId: '0x17cc4',
