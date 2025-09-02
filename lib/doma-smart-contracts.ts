@@ -726,6 +726,22 @@ export class DomaSmartContractsService {
       return false
     }
   }
+  private async isProxyOrImplDeployed(address: string): Promise<boolean> {
+    try {
+      const code = await this.web3.eth.getCode(address)
+      if (code && code !== '0x' && code !== '0x0') return true
+      const slot = DomaSmartContractsService.EIP1967_IMPLEMENTATION_SLOT
+      const implRaw = await this.web3.eth.getStorageAt(address, slot)
+      if (implRaw && implRaw !== '0x' && implRaw !== '0x0') {
+        const impl = '0x' + implRaw.slice(-40)
+        const implCode = await this.web3.eth.getCode(impl)
+        return !!implCode && implCode !== '0x' && implCode !== '0x0'
+      }
+      return false
+    } catch {
+      return false
+    }
+  }
 }
 
 // Factory function to create service instance
