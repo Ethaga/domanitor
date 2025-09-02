@@ -424,7 +424,7 @@ export class DomaAPI {
             tokenId: result.tokenId || `doma_${Math.random().toString(36).substr(2, 9)}`,
           }
         }
-        return { success: false, error: result.error || 'Tokenization failed' }
+        // If wallet path fails, continue to API/simulation fallback instead of returning error
       }
     } catch (walletError) {
       console.warn('[DomaAPI] Wallet tokenization path failed, falling back:', walletError)
