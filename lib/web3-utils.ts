@@ -162,8 +162,8 @@ export class DomaWeb3Service {
     if (provider) {
       this.web3 = new Web3(provider)
     } else {
-      // Fallback to Sepolia RPC
-      this.web3 = new Web3('https://sepolia.infura.io/v3/your-project-id')
+      // Fallback to Doma Network RPC
+      this.web3 = new Web3('https://rpc-testnet.doma.xyz')
     }
 
     // Initialize Doma Smart Contracts service
