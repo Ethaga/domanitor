@@ -33,13 +33,23 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
   const handleTokenize = async () => {
     if (!isConnected || !domain) return
 
+    const normalized = domain.trim().toLowerCase()
+    const parts = normalized.split('.')
+    const sld = parts[0]
+    const tld = parts.slice(1).join('.')
+    const domainRegex = /^[a-z0-9-]{1,63}\.[a-z0-9.-]{2,63}$/i
+    if (!sld || !tld || !domainRegex.test(normalized)) {
+      setError('Masukkan domain yang valid, mis. example.com')
+      return
+    }
+
     setIsTokenizing(true)
     setError("")
     setTokenizationProgress(0)
 
     try {
       const request: TokenizationRequest = {
-        domain,
+        domain: normalized,
         registrar: selectedRegistrar,
         walletAddress,
         fractionalize,
