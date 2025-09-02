@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Wallet, ChevronDown, AlertCircle, Shield } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { DOMA_CHAIN_CONFIG } from "@/lib/doma-smart-contracts"
 
 interface ConnectWalletProps {
   isConnected: boolean
@@ -104,10 +105,27 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
         try {
           await window.ethereum.request({
             method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x1" }],
+            params: [{ chainId: DOMA_CHAIN_CONFIG.chainId }],
           })
         } catch (switchError: any) {
-          console.log("Network switch error:", switchError)
+          if (switchError?.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: "wallet_addEthereumChain",
+                params: [{
+                  chainId: DOMA_CHAIN_CONFIG.chainId,
+                  chainName: DOMA_CHAIN_CONFIG.chainName,
+                  nativeCurrency: DOMA_CHAIN_CONFIG.nativeCurrency,
+                  rpcUrls: DOMA_CHAIN_CONFIG.rpcUrls,
+                  blockExplorerUrls: DOMA_CHAIN_CONFIG.blockExplorerUrls,
+                }],
+              })
+            } catch (addErr) {
+              console.log("Add chain failed:", addErr)
+            }
+          } else {
+            console.log("Network switch error:", switchError)
+          }
         }
       }
     } catch (error: any) {
@@ -146,10 +164,27 @@ export function ConnectWallet({ isConnected, onConnect }: ConnectWalletProps) {
         try {
           await window.okxwallet.request({
             method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x1" }],
+            params: [{ chainId: DOMA_CHAIN_CONFIG.chainId }],
           })
         } catch (switchError: any) {
-          console.log("Network switch error:", switchError)
+          if (switchError?.code === 4902) {
+            try {
+              await window.okxwallet.request({
+                method: "wallet_addEthereumChain",
+                params: [{
+                  chainId: DOMA_CHAIN_CONFIG.chainId,
+                  chainName: DOMA_CHAIN_CONFIG.chainName,
+                  nativeCurrency: DOMA_CHAIN_CONFIG.nativeCurrency,
+                  rpcUrls: DOMA_CHAIN_CONFIG.rpcUrls,
+                  blockExplorerUrls: DOMA_CHAIN_CONFIG.blockExplorerUrls,
+                }],
+              })
+            } catch (addErr) {
+              console.log("Add chain failed:", addErr)
+            }
+          } else {
+            console.log("Network switch error:", switchError)
+          }
         }
       }
     } catch (error: any) {
