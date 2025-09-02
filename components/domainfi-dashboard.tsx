@@ -132,7 +132,7 @@ export function DomanitorDashboard() {
               <div className="hidden xl:flex items-center">
                 <Badge variant="outline" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
                   <Sparkles className="h-3 w-3 mr-1" />
-                  Supporting: Ethereum (.eth) | Solana (.sol) | BNB Chain (.bnb) | Cosmos (.cosmos)
+                  Supporting: Doma Network Testnet
                 </Badge>
               </div>
 
