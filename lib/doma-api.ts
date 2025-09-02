@@ -18,7 +18,7 @@ export const DOMA_CONFIG: DomaConfig = {
   testnetUrl: "https://start.doma.xyz",
   d3ApiUrl: "https://api-testnet.doma.xyz/v1",
   forgeApiUrl: "https://forge.doma.xyz/api",
-  contractAddress: "0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e",
+  contractAddress: "0x742d35cc6634c0532925a3b8d4c9db96c4b5da5e",
   chainId: 97476,
   websocketUrl: "wss://api-testnet.doma.xyz/ws",
   graphqlUrl: "https://api-testnet.doma.xyz/graphql",
