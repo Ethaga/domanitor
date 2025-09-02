@@ -424,69 +424,85 @@ export class DomaAPI {
             tokenId: result.tokenId || `doma_${Math.random().toString(36).substr(2, 9)}`,
           }
         }
-        // If wallet path fails, continue to API/simulation fallback instead of returning error
+        // If wallet path fails, return the error unless simulation is explicitly enabled
+        if (!DOMA_USE_SIMULATION) {
+          return { success: false, error: result.error || 'Tokenization failed' }
+        }
       }
-    } catch (walletError) {
-      console.warn('[DomaAPI] Wallet tokenization path failed, falling back:', walletError)
+    } catch (walletError: any) {
+      if (!DOMA_USE_SIMULATION) {
+        return { success: false, error: walletError?.message || 'Wallet tokenization failed' }
+      }
+      console.warn('[DomaAPI] Wallet tokenization failed, simulation allowed:', walletError)
     }
 
-    // Fallback to D3 API flow (or simulation if unavailable)
-    try {
-      const voucherResponse = await fetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/request`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${DOMA_API_KEY}`,
-        },
-        body: JSON.stringify({
-          domain: request.domain,
-          owner: request.walletAddress,
-          registrar: request.registrar,
-          fractionalize: request.fractionalize,
-          totalShares: request.totalShares,
-        }),
-      })
-
-      if (!voucherResponse.ok) {
-        const errorText = await voucherResponse.text()
-        throw new Error(`Tokenization request failed: ${voucherResponse.status} - ${errorText}`)
-      }
-
-      const voucherData = await voucherResponse.json()
-      const correlationId = voucherData.correlationId
-      let attempts = 0
-      const maxAttempts = 20
-
-      while (attempts < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, 6000))
-
-        const statusResponse = await fetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/status/${correlationId}`, {
+    // Optional API fallback (disabled by default)
+    const apiFallback = process.env.NEXT_PUBLIC_DOMA_API_FALLBACK === 'true'
+    if (apiFallback) {
+      try {
+        const voucherResponse = await fetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/request`, {
+          method: "POST",
           headers: {
+            "Content-Type": "application/json",
             "Authorization": `Bearer ${DOMA_API_KEY}`,
           },
+          body: JSON.stringify({
+            domain: request.domain,
+            owner: request.walletAddress,
+            registrar: request.registrar,
+            fractionalize: request.fractionalize,
+            totalShares: request.totalShares,
+          }),
         })
 
-        if (statusResponse.ok) {
-          const statusData = await statusResponse.json()
-
-          if (statusData.status === 'completed') {
-            return {
-              success: true,
-              txHash: statusData.transactionHash,
-              tokenId: statusData.tokenId,
-            }
-          } else if (statusData.status === 'failed') {
-            throw new Error(statusData.error || 'Tokenization failed')
-          }
+        if (!voucherResponse.ok) {
+          const errorText = await voucherResponse.text()
+          throw new Error(`Tokenization request failed: ${voucherResponse.status} - ${errorText}`)
         }
 
-        attempts++
+        const voucherData = await voucherResponse.json()
+        const correlationId = voucherData.correlationId
+        let attempts = 0
+        const maxAttempts = 20
+
+        while (attempts < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, 6000))
+
+          const statusResponse = await fetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/status/${correlationId}`, {
+            headers: {
+              "Authorization": `Bearer ${DOMA_API_KEY}`,
+            },
+          })
+
+          if (statusResponse.ok) {
+            const statusData = await statusResponse.json()
+
+            if (statusData.status === 'completed') {
+              return {
+                success: true,
+                txHash: statusData.transactionHash,
+                tokenId: statusData.tokenId,
+              }
+            } else if (statusData.status === 'failed') {
+              throw new Error(statusData.error || 'Tokenization failed')
+            }
+          }
+
+          attempts++
+        }
+
+        throw new Error('Tokenization timeout - please check status later')
+
+      } catch (error: any) {
+        if (!DOMA_USE_SIMULATION) {
+          return { success: false, error: error?.message || 'Tokenization failed' }
+        }
+        console.warn('[DomaAPI] API path failed, using simulation:', error)
       }
+    }
 
-      throw new Error('Tokenization timeout - please check status later')
-
-    } catch (error) {
-      console.warn('[DomaAPI] API path failed, using simulation:', error)
+    // Simulation only if explicitly enabled
+    if (DOMA_USE_SIMULATION) {
       await new Promise((resolve) => setTimeout(resolve, 1500))
       return {
         success: true,
@@ -494,6 +510,8 @@ export class DomaAPI {
         tokenId: `doma_${Math.random().toString(36).substr(2, 9)}`,
       }
     }
+
+    return { success: false, error: 'On-chain tokenization not configured. Provide deployed contract addresses or enable simulation.' }
   }
 
   static async getDomainTokens(walletAddress: string): Promise<DomainToken[]> {
