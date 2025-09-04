@@ -60,23 +60,40 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
       // Simulate progress updates
       setTokenizationProgress(25)
       setTimeout(() => setTokenizationProgress(50), 1000)
-      setTimeout(() => setTokenizationProgress(75), 2000)
 
-      const result = await DomaAPI.tokenizeDomain(request)
+      if (simulateTokenization) {
+        // Produce a simulated txHash and show success while still linking to explorer
+        const simulatedTx = `0x${Math.random().toString(16).substr(2, 64)}`
+        setTimeout(() => {
+          setTokenizationProgress(100)
+          setTxHash(simulatedTx)
+        }, 1800)
 
-      if (result.success) {
-        setTokenizationProgress(100)
-        setTxHash(result.txHash || "")
-
-        // If fractionalizing, create fractional tokens
-        if (fractionalize && result.txHash) {
-          setTimeout(async () => {
-            await DomaAPI.fractionalizeDomain(result.txHash!, totalShares)
-          }, 1000)
+        // Simulate fractionalization if enabled
+        if (fractionalize) {
+          setTimeout(() => {
+            console.log('[TokenizationPanel] Simulated fractionalization for', simulatedTx)
+          }, 2500)
         }
       } else {
-        setError(result.error || "Tokenization failed")
-        setTokenizationProgress(0)
+        setTimeout(() => setTokenizationProgress(75), 2000)
+
+        const result = await DomaAPI.tokenizeDomain(request)
+
+        if (result.success) {
+          setTokenizationProgress(100)
+          setTxHash(result.txHash || "")
+
+          // If fractionalizing, create fractional tokens
+          if (fractionalize && result.txHash) {
+            setTimeout(async () => {
+              await DomaAPI.fractionalizeDomain(result.txHash!, totalShares)
+            }, 1000)
+          }
+        } else {
+          setError(result.error || "Tokenization failed")
+          setTokenizationProgress(0)
+        }
       }
     } catch (err) {
       setError("Network error occurred")
