@@ -161,7 +161,22 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
                 />
               </div>
 
-              <div className="bg-accent/10 border border-accent/20 rounded-lg p-3">
+              <div className="mt-3 flex items-center justify-between">
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <Zap className="h-4 w-4" />
+                    Simulate Tokenization
+                  </Label>
+                  <p className="text-sm text-muted-foreground">Use a simulated transaction hash but link to Doma testnet explorer</p>
+                </div>
+                <Switch
+                  checked={simulateTokenization}
+                  onCheckedChange={setSimulateTokenization}
+                  disabled={!isConnected || isTokenizing}
+                />
+              </div>
+
+              <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mt-3">
                 <div className="flex items-center gap-2 mb-1">
                   <DollarSign className="h-4 w-4 text-accent" />
                   <span className="font-semibold text-sm">Domain Financing</span>
