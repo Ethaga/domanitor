@@ -457,10 +457,12 @@ export class DomaAPI {
 
         if (!voucherResponse.ok) {
           const errorText = await voucherResponse.text()
+          console.error('[DomaAPI] Tokenization request failed:', { status: voucherResponse.status, body: errorText })
           throw new Error(`Tokenization request failed: ${voucherResponse.status} - ${errorText}`)
         }
 
         const voucherData = await voucherResponse.json()
+        console.log('[DomaAPI] Tokenization voucher response:', voucherData)
         const correlationId = voucherData.correlationId
         let attempts = 0
         const maxAttempts = 20
