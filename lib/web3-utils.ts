@@ -213,8 +213,18 @@ export class DomaWeb3Service {
 
       const voucher = DomaVoucherUtils.createTokenizationVoucher(names, walletAddress)
 
-      // In production, this signature would come from the registrar
-      const signature = "0x" + "0".repeat(130) // Placeholder signature
+      // In production, this signature must come from a sponsoring Registrar
+      const signature = "0x" + "0".repeat(130) // Placeholder
+
+      // Safety: prevent sending a zero-signature to on-chain contract unless explicitly allowed
+      const allowUnsigned = process.env.NEXT_PUBLIC_ALLOW_UNSIGNED_TOKENIZATION === 'true'
+      if (!allowUnsigned) {
+        // Provide actionable error so callers can fallback to API or simulation
+        return {
+          success: false,
+          error: 'REGISTRAR_SIGNATURE_REQUIRED: Tokenization requires a registrar-signed voucher. Enable API fallback (NEXT_PUBLIC_DOMA_API_FALLBACK=true) or set NEXT_PUBLIC_ALLOW_UNSIGNED_TOKENIZATION=true for local testing.'
+        }
+      }
 
       const result = await this.domaSmartContracts.requestTokenization(
         voucher,
