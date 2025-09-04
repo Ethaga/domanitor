@@ -8,7 +8,10 @@ It is currently available in **demo (testnet) mode** — no real funds are requi
 ## 🚀 How to Use
 
 Access the live demo on Netlify: `https://xxxxxxxxxxm.netlify.app/`
+
 DEMO Video: https://youtu.be/21hTemALiA8
+
+https://github.com/Ethaga/domanitor
 
 1. Open the site to view the **Domanitor landing page**.
 2. Click **Connect Wallet** and connect your crypto wallet (MetaMask, WalletConnect, etc.).  
