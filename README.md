@@ -8,7 +8,7 @@ It is currently available in **demo (testnet) mode** — no real funds are requi
 ## 🚀 How to Use
 
 Access the live demo on Netlify: `https://xxxxxxxxxxm.netlify.app/`
-
+                              
 DEMO Video: https://youtu.be/21hTemALiA8
 
 https://github.com/Ethaga/domanitor
@@ -55,6 +55,20 @@ Automatically updated metrics:
 - **Fractionalize** → Split ownership of domain tokens.  
 - **Marketplace** → Explore tokenized domains.  
 - **Bridge, Monitoring, Analytics, Alerts** → Tools for management and insights.  
+
+
+# Start
+# Clone the repo
+git clone https://github.com/Ethaga/domanitor
+
+# Navigate
+cd domonitor
+
+# Install dependencies
+npm install
+
+# Run dev server
+npm run dev
 
 ---
 
