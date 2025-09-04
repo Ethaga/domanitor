@@ -727,6 +727,10 @@ export class DomaAPI {
 
       if (response && response.ok) {
         const data = await response.json()
+        if (data.errors) {
+          console.warn('[DomaAPI] Subgraph returned errors for GetMarketData:', data.errors)
+          throw new Error('Subgraph errors')
+        }
         return {
           domains: data.data.domains || [],
           transactions: data.data.transactions || [],
