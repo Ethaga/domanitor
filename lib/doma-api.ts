@@ -593,7 +593,7 @@ export class DomaAPI {
         })
       })
 
-      if (response.ok) {
+      if (response && response.ok) {
         const data = await response.json()
         if (data.data?.domains && data.data.domains.length) {
           return data.data.domains.map((domain: any) => ({
