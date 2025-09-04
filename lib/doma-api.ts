@@ -41,6 +41,21 @@ export const DOMA_API_KEY = process.env.NEXT_PUBLIC_DOMA_API_KEY || "v1.954d51b4
 
 export const DOMA_USE_SIMULATION = process.env.NEXT_PUBLIC_DOMA_SIMULATION_ONLY === 'true'
 
+// Robust fetch helper with timeout and graceful failure handling
+const safeFetch = async (input: RequestInfo, init?: RequestInit, timeout = 8000): Promise<Response | null> => {
+  try {
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
+    const signal = controller ? controller.signal : undefined
+    const timer = controller ? setTimeout(() => controller.abort(), timeout) : null
+    const res = await fetch(input, { ...(init || {}), signal } as RequestInit)
+    if (timer) clearTimeout(timer)
+    return res
+  } catch (err) {
+    console.warn('[DomaAPI] safeFetch failed for', String(input).slice(0, 120), err)
+    return null
+  }
+}
+
 // Poll API Event Types
 export type PollEventType = 
   | "domain_registered"
@@ -554,7 +569,7 @@ export class DomaAPI {
 
     // 1) Try subgraph GraphQL endpoint
     try {
-      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
+      const response = await safeFetch(DOMA_ENDPOINTS.subgraph, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -668,7 +683,7 @@ export class DomaAPI {
 
     try {
       console.log('[DomaAPI] Fetching from updated subgraph endpoint')
-      const response = await fetch(DOMA_ENDPOINTS.subgraph, {
+      const response = await safeFetch(DOMA_ENDPOINTS.subgraph, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
