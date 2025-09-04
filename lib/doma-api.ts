@@ -455,7 +455,7 @@ export class DomaAPI {
     const apiFallback = process.env.NEXT_PUBLIC_DOMA_API_FALLBACK === 'true'
     if (apiFallback) {
       try {
-        const voucherResponse = await fetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/request`, {
+        const voucherResponse = await safeFetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/request`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -470,10 +470,10 @@ export class DomaAPI {
           }),
         })
 
-        if (!voucherResponse.ok) {
-          const errorText = await voucherResponse.text()
-          console.error('[DomaAPI] Tokenization request failed:', { status: voucherResponse.status, body: errorText })
-          throw new Error(`Tokenization request failed: ${voucherResponse.status} - ${errorText}`)
+        if (!voucherResponse || !voucherResponse.ok) {
+          const errorText = voucherResponse ? await voucherResponse.text() : 'network_error'
+          console.error('[DomaAPI] Tokenization request failed:', { status: voucherResponse?.status, body: errorText })
+          throw new Error(`Tokenization request failed: ${voucherResponse?.status || 'network_error'} - ${errorText}`)
         }
 
         const voucherData = await voucherResponse.json()
@@ -485,13 +485,13 @@ export class DomaAPI {
         while (attempts < maxAttempts) {
           await new Promise((resolve) => setTimeout(resolve, 6000))
 
-          const statusResponse = await fetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/status/${correlationId}`, {
+          const statusResponse = await safeFetch(`${DOMA_CONFIG.d3ApiUrl}/tokenization/status/${correlationId}`, {
             headers: {
               "Authorization": `Bearer ${DOMA_API_KEY}`,
             },
           })
 
-          if (statusResponse.ok) {
+          if (statusResponse && statusResponse.ok) {
             const statusData = await statusResponse.json()
 
             if (statusData.status === 'completed') {
