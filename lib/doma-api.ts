@@ -595,7 +595,9 @@ export class DomaAPI {
 
       if (response && response.ok) {
         const data = await response.json()
-        if (data.data?.domains && data.data.domains.length) {
+        if (data.errors) {
+          console.warn('[DomaAPI] Subgraph returned errors for GetDomainTokens:', data.errors)
+        } else if (data.data?.domains && data.data.domains.length) {
           return data.data.domains.map((domain: any) => ({
             id: domain.id,
             name: domain.name,
