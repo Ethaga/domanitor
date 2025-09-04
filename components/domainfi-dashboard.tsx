@@ -74,6 +74,30 @@ export function DomanitorDashboard() {
         console.log("[DomaAPI] Enhanced simulation metrics loaded successfully:", combinedMetrics)
       } catch (error) {
         console.error("[DomaAPI] Failed to load enhanced Doma metrics:", error)
+        // Fallback to deterministic simulated metrics so the dashboard always shows values
+        const fallback = {
+          totalDomains: 12847,
+          tokenizedValue: 4200000,
+          transactions24h: 234,
+          uniqueUsers24h: 127,
+          monthlyRevenue: 28400,
+          activeListings: 842,
+          recentActivity: [
+            {
+              type: 'mint',
+              tokenId: '0x1a2b3c',
+              timestamp: new Date().toISOString(),
+              transactionHash: `0x${Math.random().toString(16).substr(2, 64)}`,
+              from: '0x0000000000000000000000000000000000000000',
+              to: '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5e',
+            },
+          ],
+          priceChange24h: parseFloat(((Math.random() * 4 - 2).toFixed(1))),
+          newRegistrations24h: 73,
+          totalVolume: '2850000',
+          lastUpdate: new Date().toISOString(),
+        }
+        setMetrics(fallback)
       }
     }
 
