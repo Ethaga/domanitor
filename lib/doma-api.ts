@@ -543,30 +543,6 @@ export class DomaAPI {
         floorPrice: 0.3,
         status: "active",
       },
-      {
-        id: "doma_user_3",
-        name: "ethaga.com",
-        owner: walletAddress,
-        tokenId: "0x7g8h9i",
-        registrar: "D3 Registrar",
-        expirationDate: "2026-07-04T00:00:00Z",
-        isTokenized: true,
-        fractionalized: false,
-        floorPrice: 0.8,
-        status: "active",
-      },
-      {
-        id: "doma_user_4",
-        name: "ethaga.ape",
-        owner: walletAddress,
-        tokenId: "0x9j0k1l",
-        registrar: "D3 Registrar",
-        expirationDate: "2026-07-04T00:00:00Z",
-        isTokenized: true,
-        fractionalized: false,
-        floorPrice: 0.2,
-        status: "active",
-      }
     ]
 
     if (DOMA_USE_SIMULATION) {
@@ -574,6 +550,7 @@ export class DomaAPI {
       return simulatedDomains
     }
 
+    // 1) Try subgraph GraphQL endpoint
     try {
       const response = await fetch(DOMA_ENDPOINTS.subgraph, {
         method: 'POST',
@@ -589,10 +566,8 @@ export class DomaAPI {
                 name
                 tokenId
                 owner
-                registrant
-                expirationDate
-                createdAt
                 registrar
+                expirationDate
                 isTokenized
               }
             }
@@ -603,7 +578,7 @@ export class DomaAPI {
 
       if (response.ok) {
         const data = await response.json()
-        if (data.data?.domains) {
+        if (data.data?.domains && data.data.domains.length) {
           return data.data.domains.map((domain: any) => ({
             id: domain.id,
             name: domain.name,
@@ -619,9 +594,33 @@ export class DomaAPI {
         }
       }
     } catch (error) {
-      console.warn('[DomaAPI] Updated subgraph failed:', error)
+      console.warn('[DomaAPI] Subgraph fetch failed, will try on-chain contracts:', error)
     }
 
+    // 2) Try reading directly from on-chain contracts using DomaSmartContractsService
+    try {
+      const { DomaSmartContractsService } = await import('./doma-smart-contracts')
+      const svc = new DomaSmartContractsService()
+      const assets = await svc.getDomainAssets(walletAddress)
+      if (assets && assets.length) {
+        return assets.map(a => ({
+          id: a.tokenId,
+          name: a.name,
+          owner: a.owner,
+          tokenId: a.tokenId,
+          registrar: `Registrar #${a.registrarIanaId}`,
+          expirationDate: a.expirationDate,
+          isTokenized: a.isActive,
+          fractionalized: false,
+          floorPrice: parseFloat(a.tokenizedValue) || Math.random() * 2 + 0.1,
+          status: a.isActive ? 'active' : 'expired'
+        }))
+      }
+    } catch (contractErr) {
+      console.warn('[DomaAPI] On-chain contract fetch failed:', contractErr)
+    }
+
+    // 3) Fallback to simulated data
     console.log('[DomaAPI] Using enhanced simulation data for wallet:', walletAddress)
     return simulatedDomains
   }
