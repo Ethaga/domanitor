@@ -746,12 +746,26 @@ export class DomaSmartContractsService {
     } catch (error: any) {
       // Provide clearer logs for ContractExecutionError and revert data
       console.error('[DomaSmartContracts] Error fetching domain assets:', error)
-      const errData = error?.data || error?.error?.data
+      const errData = error?.data || error?.error?.data || error?.error?.response?.data || null
       if (errData) console.error('[DomaSmartContracts] Raw error data:', errData)
 
-      // If revert without data (0x), give a helpful message
-      if (String(error?.message || '').includes('ContractExecutionError') || errData === '0x' || errData === '0x0') {
-        console.error('[DomaSmartContracts] Contract call reverted with empty data — likely ABI mismatch or missing method on contract. Returning fallback data.')
+      // Try to decode common solidity revert reason: Error(string) selector 0x08c379a0
+      try {
+        const hex = typeof errData === 'string' ? errData : (errData?.result || errData?.data || '')
+        if (hex && hex.startsWith && hex.startsWith('0x08c379a0')) {
+          try {
+            const reason = this.web3.eth.abi.decodeParameter('string', '0x' + hex.slice(10))
+            console.error('[DomaSmartContracts] Revert reason decoded:', reason)
+          } catch (decodeErr) {
+            console.error('[DomaSmartContracts] Failed to decode revert reason:', decodeErr)
+          }
+        } else if (hex === '0x' || hex === '0x0' || String(error?.message || '').includes('ContractExecutionError')) {
+          console.error('[DomaSmartContracts] Contract call reverted with empty data — likely ABI mismatch, wrong contract address, or call to non-existent method. Returning fallback data.')
+        } else if (hex) {
+          console.warn('[DomaSmartContracts] Revert data present but unknown selector. This may be a custom error. Hex prefix:', typeof hex === 'string' ? hex.slice(0, 10) : hex)
+        }
+      } catch (e) {
+        console.error('[DomaSmartContracts] Error while attempting to decode revert data:', e)
       }
 
       return simulatedFallback
