@@ -1,13 +1,18 @@
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
 
-// Doma Protocol Smart Contract Addresses on Sepolia testnet
+// Doma Protocol Smart Contract Addresses (deployed testnet values)
 export const DOMA_SMART_CONTRACTS = {
-  DOMA_RECORD: '0x742d35cc6634c0532925a3b8d4c9db96c4b5da5e',
-  DOMA_FORWARDER: '0x123d35cc6634c0532925a3b8d4c9db96c4b5da5e',
-  DOMA_GATEWAY: '0x456d35cc6634c0532925a3b8d4c9db96c4b5da5e',
-  DOMA_RECORD_PROXY: '0x789d35cc6634c0532925a3b8d4c9db96c4b5da5e',
-  OWNERSHIP_TOKEN: '0x424bdf2e8a6f52bd2c1c81d9437b0dc0309df90f'
+  // Primary Doma Record contract (Doma Testnet)
+  DOMA_RECORD: '0xb1508299A01c02aC3B70c7A8B0B07105aaB29E99',
+  // EIP-2771 Trusted Forwarder (if applicable)
+  DOMA_FORWARDER: '0x8420729Dc9eBb5a30dBa8CEe1392F56bfc03b1F5',
+  // Cross-chain Gateway deployed on testnets
+  DOMA_GATEWAY: '0xa40aA710F0C77DF3De6CEe7493d1FfF3715D59Da',
+  // Proxy Record used on tokenization chains
+  DOMA_RECORD_PROXY: '0xb1508299A01c02aC3B70c7A8B0B07105aaB29E99',
+  // Ownership token (ERC-721) deployed on Doma Testnet
+  OWNERSHIP_TOKEN: '0x797293E811f9C5eFa1973004B581E46d1787F929'
 }
 
 const DOMA_USE_SIMULATION = process.env.NEXT_PUBLIC_DOMA_SIMULATION_ONLY === 'true'
