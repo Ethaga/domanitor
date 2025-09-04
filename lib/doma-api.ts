@@ -723,7 +723,7 @@ export class DomaAPI {
         })
       })
 
-      if (response.ok) {
+      if (response && response.ok) {
         const data = await response.json()
         return {
           domains: data.data.domains || [],
