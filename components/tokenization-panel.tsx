@@ -27,6 +27,7 @@ export function TokenizationPanel({ walletAddress, isConnected }: TokenizationPa
   const [isTokenizing, setIsTokenizing] = useState(false)
   const [fractionalize, setFractionalize] = useState(false)
   const [totalShares, setTotalShares] = useState(1000)
+  const [simulateTokenization, setSimulateTokenization] = useState(true)
   const [txHash, setTxHash] = useState("")
   const [error, setError] = useState("")
 
