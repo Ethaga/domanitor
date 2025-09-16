@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 
-const DOMA_API_BASE = process.env.DOMA_API_BASE || 'https://api.doma.xyz'
-const DOMA_GRAPHQL_URL = process.env.DOMA_GRAPHQL_URL || 'https://api.doma.xyz/graphql'
+const DOMA_API_BASE = process.env.DOMA_API_BASE || 'https://api-testnet.doma.xyz'
+const DOMA_GRAPHQL_URL = process.env.DOMA_GRAPHQL_URL || 'https://api-testnet.doma.xyz/graphql'
 const DOMA_API_KEY = process.env.DOMA_API_KEY || ''
 
 export interface ForwardOptions {

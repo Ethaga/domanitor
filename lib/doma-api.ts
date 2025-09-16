@@ -13,10 +13,10 @@ export interface DomaConfig {
 }
 
 export const DOMA_CONFIG: DomaConfig = {
-  testnetUrl: "https://doma.xyz",
-  d3ApiUrl: "https://api-testnet.doma.xyz",
+  testnetUrl: "https://api-testnet.doma.xyz",
+  d3ApiUrl: "https://api-testnet.doma.xyz/v1",
   forgeApiUrl: "https://forge.doma.xyz/api",
-  contractAddress: "0x9A374915648f1352827fFbf0A7bB5752b6995eB7", // testnet ownership token
+  contractAddress: "0x424bDf2E8a6F52Bd2c1C81D9437b0DC0309DF90f", // ownership token testnet
   chainId: 97476, // Doma Testnet Chain ID
   websocketUrl: "wss://api-testnet.doma.xyz/ws",
   graphqlUrl: "https://api-testnet.doma.xyz/graphql",

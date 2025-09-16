@@ -56,9 +56,9 @@ export default function WalletAssetsPage() {
           
           {/* Wallet Connection */}
           <div className="flex items-center gap-4">
-            <Badge variant="outline" className="border-blue-300 text-blue-800 dark:border-blue-700 dark:text-blue-200">
+            <Badge variant="outline" className="border-purple-300 text-purple-800 dark:border-purple-700 dark:text-purple-200">
               <Network className="h-3 w-3 mr-1" />
-              Doma Mainnet
+              Doma Testnet
             </Badge>
             <ConnectWallet
               onConnect={handleWalletConnect}
@@ -77,14 +77,14 @@ export default function WalletAssetsPage() {
                 <div className="flex items-center gap-3">
                   <Info className="h-5 w-5 text-blue-600" />
                   <div>
-                    <p className="font-medium text-blue-800 dark:text-blue-200">Connected to Doma Mainnet</p>
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Using Web3.js to read data from smart contracts on Ethereum mainnet
+                    <p className="font-medium text-purple-800 dark:text-purple-200">Connected to Doma Testnet</p>
+                    <p className="text-sm text-purple-700 dark:text-purple-300">
+                      Using Web3.js to read data from smart contracts on Doma Testnet
                     </p>
                   </div>
                 </div>
                 <Badge variant="outline" className="border-green-300 text-green-800 dark:border-green-700 dark:text-green-200">
-                  Chain ID: 1
+                  Chain ID: 97476
                 </Badge>
               </div>
             </CardContent>
